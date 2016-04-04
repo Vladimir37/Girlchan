@@ -1,28 +1,46 @@
-var express = require('express');
-var cookieParser = require('cookie-parser');
-var favicon = require('serve-favicon');
-var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
 
-var app = express();
+var connection = mongoose.connection;
 
-//render templates
-app.set('view engine', 'jade');
-app.set('views', __dirname +  '/client/view');
+//connection check
+connection.on('open', function() {
+    console.log('Connection to DB created!');
+});
+connection.on('error', function(err) {
+    console.log('Error connect to DB!');
+    console.log(err);
+});
 
-//cookies and POST data
-app.use(cookieParser());
-app.use(bodyParser());
+// Models
+var models = {};
 
-//favicon
-//app.use(favicon(__dirname + '/client/source/img/main/favicon.ico'));
+var adminSchema = new mongoose.Schema({
+    name: String,
+    pass: String
+});
+models.Admin = mongoose.model('Admin', adminSchema);
 
-//app.use('/', router);
+var langSchema = new mongoose.Schema({
+    name: String,
+    addr: String
+});
+models.Langs = mongoose.model('Lang', langSchema);
 
-//public source
-app.use('/src', express.static(__dirname + '/client/source'));
+var boardSchema = new mongoose.Schema({
+    name: String,
+    addr: String
+});
+models.Board = mongoose.model('Board', boardSchema);
 
-//errors
-//app.use(errors.e404);
-//app.use(errors.render);
+var postSchema = new mongoose.Schema({
+    board: String,
+    answer: Boolean,
+    thread: String,
+    time: Date,
+    text: String
+});
+models.Post = mongoose.model('Post', postSchema);
 
-module.exports = app;
+mongoose.connect('mongodb://localhost/girlchan');
+
+module.exports = models;
