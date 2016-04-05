@@ -1,0 +1,32 @@
+{
+    "en": {
+        "full_name": "English",
+        "boards": {
+            "b": "Random",
+            "s": "Relationship",
+            "p": "Pregnancy",
+            "k": "Children"
+        },
+        "phrases": {
+            "new_thread": "New thread",
+            "all_messages": "Total %s messages",
+            "open": "Open thread",
+            "reply": "Reply to this thread"
+        }
+    },
+    "ru": {
+        "full_name": "Русский",
+        "boards": {
+            "b": "Разное",
+            "s": "Отношения",
+            "p": "Беременность",
+            "k": "Дети"
+        },
+        "phrases": {
+            "new_thread": "Новая тема",
+            "all_messages": "Всего %s сообщений",
+            "open": "Открыть тему",
+            "reply": "Ответить в эту тему"
+        }
+    }
+}

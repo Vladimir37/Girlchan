@@ -14,25 +14,8 @@ connection.on('error', function(err) {
 // Models
 var models = {};
 
-var adminSchema = new mongoose.Schema({
-    name: String,
-    pass: String
-});
-models.Admin = mongoose.model('Admin', adminSchema);
-
-var langSchema = new mongoose.Schema({
-    name: String,
-    addr: String
-});
-models.Langs = mongoose.model('Lang', langSchema);
-
-var boardSchema = new mongoose.Schema({
-    name: String,
-    addr: String
-});
-models.Board = mongoose.model('Board', boardSchema);
-
 var postSchema = new mongoose.Schema({
+    lang: String,
     board: String,
     answer: Boolean,
     thread: String,

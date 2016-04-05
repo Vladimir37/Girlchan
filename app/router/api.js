@@ -1,6 +1,6 @@
 var express = require('express');
 
-var api = require('../actions/api');
+var api = require('../controllers/api');
 
 var router = express.Router();
 
