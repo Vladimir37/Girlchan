@@ -14,6 +14,18 @@ connection.on('error', function(err) {
 // Models
 var models = {};
 
+var langSchema = new mongoose.Schema({
+    addr: String,
+    name: String
+});
+models.Lang = mongoose.model('Lang', langSchema);
+
+var boardSchema = new mongoose.Schema({
+    addr: String,
+    names: Object
+});
+models.Board = mongoose.model('Board', boardSchema);
+
 var postSchema = new mongoose.Schema({
     lang: String,
     board: String,
@@ -25,5 +37,16 @@ var postSchema = new mongoose.Schema({
 models.Post = mongoose.model('Post', postSchema);
 
 mongoose.connect('mongodb://localhost/girlchan');
+
+//models.Board.findOne({
+//    addr: 'te'
+//}).then(function (doc) {
+//    doc.set('names.fr', 'TESTES');
+//    return doc.save();
+//}).then(function (qw) {
+//    console.log(qw);
+//}).catch(function (err) {
+//    console.log(err);
+//});
 
 module.exports = models;

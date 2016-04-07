@@ -1,9 +1,9 @@
 var models = require('../basis/models');
-var langs = require('../data/languages');
 var config = require('../../config');
 
-class board {
+class Board {
     constructor(lang, board) {
+        var self = this;
         models.Post.find({
             lang,
             board,
@@ -15,7 +15,7 @@ class board {
             threads.forEach(function(thread) {
                 stack.push(thread._id);
             });
-            this.stack = stack;
+            self.stack = stack;
         }).catch(function(err) {
             throw err;
         });
@@ -45,8 +45,25 @@ class board {
             this.stack.unshift(+this.stack.splice(index, 1));
         }
     }
-};
+}
 
+// Initialization
+var stacks = {};
 
+var stack_data_request = [models.Lang.find(), models.Board.find()];
 
-module.exports = board;
+Promise.all(stack_data_request).then(function(result) {
+    result[0].forEach(function(lang) {
+        stacks[lang.addr] = {};
+        result[1].forEach(function(board) {
+            stacks[lang.addr][board.addr] = new Board(lang.addr, board.addr);
+        });
+    });
+}).then(function() {
+    console.log('Stack successfully created');
+}).catch(function(err) {
+    console.log('Stack creation error');
+    console.log(err);
+});
+
+module.exports = stacks;

@@ -1,9 +1,11 @@
 var express = require('express');
 
-var api = require('../controllers/api');
+var API = require('../controllers/api');
 
 var router = express.Router();
+var api = new API();
 
-router.get('/langs', api.langs);
+router.get('/langs', api.langs.bind(api));
+router.get('/boards', api.boards.bind(api));
 
 module.exports = router;
