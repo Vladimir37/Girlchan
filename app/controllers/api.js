@@ -125,6 +125,46 @@ class ApiController {
             console.log(err);
         });
     }
+    create_thread(req, res, next) {
+        var lang = req.params.lang;
+        var board = req.params.board;
+        var text = req.body.content;
+        var time_now = new Date();
+        models.Post.create({
+            lang,
+            board,
+            answer: false,
+            time: time_now,
+            text
+        }).then(function(new_thread) {
+            stacks[lang][board].add_thread(new_thread._id);
+            res.end(serialize(0));
+        }).catch(function(err) {
+            console.log(err);
+            res.end(serialize(1));
+        });
+    }
+    create_post(req, res, next) {
+        var lang = req.params.lang;
+        var board = req.params.board;
+        var thread = req.params.thread;
+        var text = req.body.content;
+        var time_now = new Date();
+        models.Post.create({
+            lang,
+            board,
+            answer: true,
+            thread,
+            time: time_now,
+            text
+        }).then(function() {
+            stacks[lang][board].bump_thread(thread);
+            res.end(serialize(0));
+        }).catch(function(err) {
+            console.log(err);
+            res.end(serialize(1));
+        });
+    }
 }
 
 module.exports = ApiController;
