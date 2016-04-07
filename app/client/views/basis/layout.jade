@@ -6,8 +6,16 @@ html(lang="ru")
         meta(name="robots",content="all")
         meta(name="description",content="Описание")
         meta(name="keywords",content="Ключевые, слова")
+        script(src='/src/js/bootstrap.min.js')
+        script(src='/src/js/main.js')
+        link(rel="stylesheet" href='/src/css/bootstrap.min.css')
+        link(rel="stylesheet" href='/src/css/bootstrap-theme.min.css')
+        link(rel="stylesheet" href='/src/css/main.css')
         //- add mixins
         include mixins
     body
-        section.header
-            block content
+        section.wrapper
+            section.header
+                h1 Girlchan
+            section.content.jumbotron
+                block content
