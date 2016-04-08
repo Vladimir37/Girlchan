@@ -25,6 +25,18 @@ export var ServerError = React.createClass({
     }
 });
 
+export var PleaseWait = React.createClass({
+    getInitialState() {
+        return null;
+    },
+    render() {
+        return <article className="error">
+            <h3>Please wait...</h3>
+            <img src="/src/images/main/load.gif" alt="loading"/>
+        </article>;
+    }
+});
+
 export var FirstPost = React.createClass({
     getInitialState() {
         return null;

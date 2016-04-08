@@ -40,6 +40,9 @@ class BoardController {
             errors.e404(req, res, next);
         }
     }
+    page(req, res, next) {
+        res.render('pages/main');
+    }
 }
 
 module.exports = BoardController;

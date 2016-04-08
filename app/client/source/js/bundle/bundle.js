@@ -47,6 +47,7 @@
 	__webpack_require__(1);
 	__webpack_require__(2);
 	__webpack_require__(4);
+	(function webpackMissingModule() { throw new Error("Cannot find module \"./router\""); }());
 	__webpack_require__(17);
 	__webpack_require__(174);
 	module.exports = __webpack_require__(175);

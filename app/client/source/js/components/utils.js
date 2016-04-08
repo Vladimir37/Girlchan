@@ -1,4 +1,13 @@
-export default function(data, url, type, success, data_error, system_error) {
+function error_handling(context) {
+    return function(err) {
+        console.log(err);
+        context.setState({
+            error: true
+        });
+    }
+}
+
+export default function(data, url, type, context, success) {
     var emptyFunction = function(){};
     success = success || emptyFunction;
     error = error || emptyFunction;
@@ -9,7 +18,7 @@ export default function(data, url, type, success, data_error, system_error) {
         type,
         data,
         dataType: 'json',
-        error: system_error,
+        error: error_handling(context),
         success(raw_data) {
             try {
                 var data = JSON.parse(raw_data);
@@ -17,11 +26,11 @@ export default function(data, url, type, success, data_error, system_error) {
                     success(data.body);
                 }
                 else {
-                    data_error(data.status);
+                    error_handling(context)(data.status);
                 }
             }
             catch(err) {
-                system_error(err);
+                error_handling(context)(err);
             }
         }
     });
