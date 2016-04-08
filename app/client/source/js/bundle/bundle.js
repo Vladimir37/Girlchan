@@ -37525,9 +37525,9 @@
 	        var req_data = {
 	            lang: this.props.params.lang,
 	            board: this.props.params.board,
-	            thread: JSON.stringify(self.state.threads.slice(self.state.start, self.state.limit))
+	            threads: JSON.stringify(self.state.threads.slice(self.state.start, self.state.limit))
 	        };
-	        (0, _utils2.default)('/api/short_threads', req_data, self, function (threads) {
+	        (0, _utils2.default)('/api/short_threads', req_data, 'GET', self, function (threads) {
 	            self.setState({
 	                loaded_content: true,
 	                content: self.state.content.concat(threads),
@@ -37548,7 +37548,11 @@
 	            var threads_arr = this.state.content.map(function (thread) {
 	                return _react2.default.createElement(Thread, { data: thread });
 	            });
-	            return threads_arr;
+	            return _react2.default.createElement(
+	                'article',
+	                { className: 'threads_list' },
+	                threads_arr
+	            );
 	        }
 	    }
 	});
@@ -37714,18 +37718,11 @@
 	        data: data,
 	        dataType: 'json',
 	        error: error_handling(context),
-	        success: function success(raw_data) {
-	            console.log(raw_data);
-	            try {
-	                var data = JSON.parse(raw_data);
-	                if (data.status == 0) {
-	                    _success(data.body);
-	                } else {
-	                    error_handling(context)(data.status);
-	                }
-	            } catch (err) {
-	                console.log('Read error');
-	                error_handling(context)(err);
+	        success: function success(data) {
+	            if (data.status == 0) {
+	                _success(data.body);
+	            } else {
+	                error_handling(context)(data.status);
 	            }
 	        }
 	    });

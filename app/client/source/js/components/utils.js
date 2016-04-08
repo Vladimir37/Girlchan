@@ -18,20 +18,12 @@ export default function(url, data, type, context, success) {
         data,
         dataType: 'json',
         error: error_handling(context),
-        success(raw_data) {
-            console.log(raw_data);
-            try {
-                var data = JSON.parse(raw_data);
-                if(data.status == 0) {
-                    success(data.body);
-                }
-                else {
-                    error_handling(context)(data.status);
-                }
+        success(data) {
+            if(data.status == 0) {
+                success(data.body);
             }
-            catch(err) {
-                console.log('Read error');
-                error_handling(context)(err);
+            else {
+                error_handling(context)(data.status);
             }
         }
     });

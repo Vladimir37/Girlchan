@@ -12,6 +12,6 @@ router.get('/posts', api.posts.bind(api));
 router.get('/page', api.page.bind(api));
 router.get('/full_thread', api.full_thread.bind(api));
 router.post('/create_thread', api.create_thread.bind(api));
-router.post('/create_post', api.create_thread.bind(api));
+router.post('/create_post', api.create_post.bind(api));
 
 module.exports = router;

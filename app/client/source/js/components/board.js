@@ -51,9 +51,9 @@ export var Board = React.createClass({
         var req_data = {
             lang: this.props.params.lang,
             board: this.props.params.board,
-            thread: JSON.stringify(self.state.threads.slice(self.state.start, self.state.limit))
+            threads: JSON.stringify(self.state.threads.slice(self.state.start, self.state.limit))
         };
-        Request('/api/short_threads', req_data, self, function(threads) {
+        Request('/api/short_threads', req_data, 'GET', self, function(threads) {
             self.setState({
                 loaded_content: true,
                 content: self.state.content.concat(threads),
@@ -77,7 +77,9 @@ export var Board = React.createClass({
             var threads_arr = this.state.content.map(function(thread) {
                 return <Thread data={thread} />
             });
-            return threads_arr;
+            return <article className="threads_list">
+                {threads_arr}
+            </article>;
         }
     }
 });
