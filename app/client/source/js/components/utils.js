@@ -10,8 +10,6 @@ function error_handling(context) {
 export default function(data, url, type, context, success) {
     var emptyFunction = function(){};
     success = success || emptyFunction;
-    error = error || emptyFunction;
-    complete = complete || emptyFunction;
     data = data || {};
     $.ajax({
         url,

@@ -47,10 +47,10 @@
 	__webpack_require__(1);
 	__webpack_require__(2);
 	__webpack_require__(4);
-	(function webpackMissingModule() { throw new Error("Cannot find module \"./router\""); }());
 	__webpack_require__(17);
 	__webpack_require__(174);
-	module.exports = __webpack_require__(175);
+	__webpack_require__(175);
+	module.exports = __webpack_require__(232);
 
 
 /***/ },
@@ -37414,6 +37414,322 @@
 
 	exports['default'] = _createRouterHistory2['default'](_historyLibCreateHashHistory2['default']);
 	module.exports = exports['default'];
+
+/***/ },
+/* 232 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {"use strict";
+
+	var _react = __webpack_require__(17);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRouter = __webpack_require__(175);
+
+	var _reactDom = __webpack_require__(174);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _board = __webpack_require__(233);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	$(document).ready(function () {
+	    _reactDom2.default.render(_react2.default.createElement(
+	        _reactRouter.Router,
+	        { history: _reactRouter.browserHistory },
+	        _react2.default.createElement(_reactRouter.Route, { path: "/:lang/:board", component: _board.Board })
+	    ), document.getElementsByClassName('main_content')[0]);
+	});
+	//<Route path="/" component={}></Route>
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 233 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.Board = undefined;
+
+	var _react = __webpack_require__(17);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(174);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _templates = __webpack_require__(234);
+
+	var _utils = __webpack_require__(235);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Thread = _react2.default.createClass({
+	    displayName: 'Thread',
+	    getInitialState: function getInitialState() {
+	        return null;
+	    },
+	    render: function render() {
+	        var posts_arr = this.props.data.posts.map(function (post) {
+	            return _react2.default.createElement(_templates.Post, { data: post });
+	        });
+	        return _react2.default.createElement(
+	            'section',
+	            { className: 'thread' },
+	            _react2.default.createElement(_templates.FirstPost, { data: data.op_post }),
+	            posts_arr
+	        );
+	    }
+	});
+
+	var Board = exports.Board = _react2.default.createClass({
+	    displayName: 'Board',
+	    getInitialState: function getInitialState() {
+	        return {
+	            loaded_threads: false,
+	            loaded_content: false,
+	            error: false,
+	            threads: [],
+	            content: [],
+	            limit: 10,
+	            start: 0
+	        };
+	    },
+	    get_threads: function get_threads() {
+	        var self = this;
+	        var req_data = {
+	            lang: this.props.params.lang,
+	            board: this.props.params.board
+	        };
+	        (0, _utils2.default)('/api/page', req_data, 'GET', self, function (threads) {
+	            self.setState({
+	                loaded_threads: true,
+	                threads: threads
+	            }, function (err) {});
+	        });
+	    },
+	    get_content: function get_content() {
+	        var self = this;
+	        var req_data = {
+	            lang: this.props.params.lang,
+	            board: this.props.params.board,
+	            thread: JSON.stringify(self.state.threads.slice(self.state.start, self.state.limit))
+	        };
+	        (0, _utils2.default)('/api/short_threads', req_data, self, function (threads) {
+	            self.setState({
+	                loaded_content: true,
+	                content: self.state.content.concat(threads),
+	                start: self.state.start + self.state.limit
+	            });
+	        });
+	    },
+	    render: function render() {
+	        if (this.state.error) {
+	            return _react2.default.createElement(_templates.ServerError, null);
+	        } else if (!this.state.error && !this.state.loaded_threads) {
+	            this.get_threads();
+	            return _react2.default.createElement(_templates.PleaseWait, null);
+	        } else if (!this.state.error && !this.state.loaded_content) {
+	            this.get_content();
+	            return _react2.default.createElement(_templates.PleaseWait, null);
+	        } else {
+	            var threads_arr = this.state.content.map(function (thread) {
+	                return _react2.default.createElement(Thread, { data: thread });
+	            });
+	            return threads_arr;
+	        }
+	    }
+	});
+
+/***/ },
+/* 234 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.Post = exports.FirstPost = exports.PleaseWait = exports.ServerError = exports.NotFound = undefined;
+
+	var _react = __webpack_require__(17);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(174);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var NotFound = exports.NotFound = _react2.default.createClass({
+	    displayName: 'NotFound',
+	    getInitialState: function getInitialState() {
+	        return null;
+	    },
+	    render: function render() {
+	        return _react2.default.createElement(
+	            'article',
+	            { className: 'error' },
+	            _react2.default.createElement(
+	                'h2',
+	                null,
+	                'Error 404'
+	            ),
+	            _react2.default.createElement(
+	                'h3',
+	                null,
+	                'Page not found.'
+	            )
+	        );
+	    }
+	});
+
+	var ServerError = exports.ServerError = _react2.default.createClass({
+	    displayName: 'ServerError',
+	    getInitialState: function getInitialState() {
+	        return null;
+	    },
+	    render: function render() {
+	        return _react2.default.createElement(
+	            'article',
+	            { className: 'error' },
+	            _react2.default.createElement(
+	                'h2',
+	                null,
+	                'Error 500'
+	            ),
+	            _react2.default.createElement(
+	                'h3',
+	                null,
+	                'Server error! Try again later.'
+	            )
+	        );
+	    }
+	});
+
+	var PleaseWait = exports.PleaseWait = _react2.default.createClass({
+	    displayName: 'PleaseWait',
+	    getInitialState: function getInitialState() {
+	        return null;
+	    },
+	    render: function render() {
+	        return _react2.default.createElement(
+	            'article',
+	            { className: 'error' },
+	            _react2.default.createElement(
+	                'h3',
+	                null,
+	                'Please wait...'
+	            ),
+	            _react2.default.createElement('img', { src: '/src/images/main/load.gif', alt: 'loading' })
+	        );
+	    }
+	});
+
+	var FirstPost = exports.FirstPost = _react2.default.createClass({
+	    displayName: 'FirstPost',
+	    getInitialState: function getInitialState() {
+	        return null;
+	    },
+	    render: function render() {
+	        return _react2.default.createElement(
+	            'article',
+	            { className: 'panel panel-primary' },
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'panel-heading' },
+	                this.props.data.time
+	            ),
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'panel-body' },
+	                this.props.data.text
+	            )
+	        );
+	    }
+	});
+
+	var Post = exports.Post = _react2.default.createClass({
+	    displayName: 'Post',
+	    getInitialState: function getInitialState() {
+	        return null;
+	    },
+	    render: function render() {
+	        return _react2.default.createElement(
+	            'article',
+	            { className: 'panel panel-default' },
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'panel-heading' },
+	                this.props.data.time
+	            ),
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'panel-body' },
+	                this.props.data.text
+	            )
+	        );
+	    }
+	});
+
+/***/ },
+/* 235 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	function error_handling(context) {
+	    return function (err) {
+	        console.log(err);
+	        context.setState({
+	            error: true
+	        });
+	    };
+	}
+
+	function _default(data, url, type, context, _success) {
+	    var emptyFunction = function emptyFunction() {};
+	    _success = _success || emptyFunction;
+	    data = data || {};
+	    $.ajax({
+	        url: url,
+	        type: type,
+	        data: data,
+	        dataType: 'json',
+	        error: error_handling(context),
+	        success: function success(raw_data) {
+	            try {
+	                var data = JSON.parse(raw_data);
+	                if (data.status == 0) {
+	                    _success(data.body);
+	                } else {
+	                    console.log('INCORRECT');
+	                    error_handling(context)(data.status);
+	                }
+	            } catch (err) {
+	                error_handling(context)(err);
+	            }
+	        }
+	    });
+	}exports.default = _default;
+	;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }
 /******/ ]);

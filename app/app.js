@@ -23,10 +23,10 @@ app.use(bodyParser.urlencoded({
 //favicon
 //app.use(favicon(__dirname + '/client/source/img/main/favicon.ico'));
 
-app.use('/', router);
-
 //public source
 app.use('/src', express.static(__dirname + '/client/source'));
+
+app.use('/', router);
 
 //errors
 app.use(errors.e404);

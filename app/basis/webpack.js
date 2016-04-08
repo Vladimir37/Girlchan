@@ -2,9 +2,9 @@ var webpack = require('webpack');
 var path = require('path');
 
 var config = {
-    context: path.join(__dirname, "../../client/source/js/components"),
+    context: path.join(__dirname, "../client/source/js/components"),
     entry: [
-        "jquery", "toastr", "bootstrap", "./router", "react", "react-dom", "react-router"
+        "jquery", "toastr", "bootstrap", "react", "react-dom", "react-router", "./router"
     ],
     output: {
         path: path.join(__dirname, "../../app/client/source/js/bundle")

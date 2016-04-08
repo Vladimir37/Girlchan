@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
-import {Post, FirstPost, NotFound, ServerError, PleaseWait} from 'templates.js';
-import Request from 'utils.js';
+import {Post, FirstPost, NotFound, ServerError, PleaseWait} from './templates.js';
+import Request from './utils.js';
 
 var Thread = React.createClass({
     getInitialState() {
@@ -19,7 +19,7 @@ var Thread = React.createClass({
     }
 });
 
-export default React.createClass({
+export var Board = React.createClass({
     getInitialState() {
         return {
             loaded_threads: false,
