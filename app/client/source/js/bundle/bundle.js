@@ -37628,7 +37628,7 @@
 	    render: function render() {
 	        return _react2.default.createElement(
 	            'article',
-	            { className: 'error' },
+	            { className: 'loading' },
 	            _react2.default.createElement(
 	                'h3',
 	                null,
@@ -37703,8 +37703,9 @@
 	    };
 	}
 
-	function _default(data, url, type, context, _success) {
+	function _default(url, data, type, context, _success) {
 	    var emptyFunction = function emptyFunction() {};
+	    console.log(url);
 	    _success = _success || emptyFunction;
 	    data = data || {};
 	    $.ajax({
@@ -37714,15 +37715,16 @@
 	        dataType: 'json',
 	        error: error_handling(context),
 	        success: function success(raw_data) {
+	            console.log(raw_data);
 	            try {
 	                var data = JSON.parse(raw_data);
 	                if (data.status == 0) {
 	                    _success(data.body);
 	                } else {
-	                    console.log('INCORRECT');
 	                    error_handling(context)(data.status);
 	                }
 	            } catch (err) {
+	                console.log('Read error');
 	                error_handling(context)(err);
 	            }
 	        }

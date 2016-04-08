@@ -23,8 +23,8 @@ class ApiController {
         res.end(serialize(0, this.all_boards));
     }
     page(req, res, next) {
-        var lang = req.body.lang;
-        var board = req.body.board;
+        var lang = req.query.lang;
+        var board = req.query.board;
         if(stacks[lang][board]) {
             res.end(serialize(0, stacks[lang][board].stack));
         }
@@ -34,11 +34,11 @@ class ApiController {
     }
     short_threads(req, res, next) {
         var threads = [];
-        var lang = req.body.lang;
-        var board = req.body.board;
+        var lang = req.query.lang;
+        var board = req.query.board;
         var thread_arr;
         try {
-            thread_arr = JSON.parse(req.body.threads);
+            thread_arr = JSON.parse(req.query.threads);
         }
         catch(err) {
             res.end(serialize(2));
@@ -78,11 +78,11 @@ class ApiController {
         res.end(serialize(0, threads));
     }
     posts(req, res, next) {
-        var lang = req.body.lang;
-        var board = req.body.board;
-        var thread = req.body.thread;
-        var skip = req.body.skip;
-        var limit = req.body.limit;
+        var lang = req.query.lang;
+        var board = req.query.board;
+        var thread = req.query.thread;
+        var skip = req.query.skip;
+        var limit = req.query.limit;
         models.Post.find({
             lang,
             board,
@@ -98,9 +98,9 @@ class ApiController {
         });
     }
     full_thread(req, res, next) {
-        var lang = req.body.lang;
-        var board = req.body.board;
-        var thread = req.body.thread;
+        var lang = req.query.lang;
+        var board = req.query.board;
+        var thread = req.query.thread;
         var op_post = models.Post.findOne({
             lang,
             board,

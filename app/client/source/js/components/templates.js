@@ -30,7 +30,7 @@ export var PleaseWait = React.createClass({
         return null;
     },
     render() {
-        return <article className="error">
+        return <article className="loading">
             <h3>Please wait...</h3>
             <img src="/src/images/main/load.gif" alt="loading"/>
         </article>;

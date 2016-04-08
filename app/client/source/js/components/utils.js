@@ -7,8 +7,9 @@ function error_handling(context) {
     }
 }
 
-export default function(data, url, type, context, success) {
+export default function(url, data, type, context, success) {
     var emptyFunction = function(){};
+    console.log(url);
     success = success || emptyFunction;
     data = data || {};
     $.ajax({
@@ -18,6 +19,7 @@ export default function(data, url, type, context, success) {
         dataType: 'json',
         error: error_handling(context),
         success(raw_data) {
+            console.log(raw_data);
             try {
                 var data = JSON.parse(raw_data);
                 if(data.status == 0) {
@@ -28,6 +30,7 @@ export default function(data, url, type, context, success) {
                 }
             }
             catch(err) {
+                console.log('Read error');
                 error_handling(context)(err);
             }
         }
