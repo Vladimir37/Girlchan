@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {Router} from "react-router";
 
 import {Request, toast} from './utils.js';
 
@@ -77,20 +78,21 @@ export var Posting = React.createClass({
         var self = this;
         var url = "/api/" + this.props.addr;
         var req_data = {
-            lang: this.props.params.lang,
-            board: this.props.params.board,
+            lang: this.props.param.lang,
+            board: this.props.param.board,
             content: this.state.textValue,
-            thread: this.props.params.thread
+            thread: this.props.param.thread
         };
-        Request(url, req_data, 'POST', this, function(data) {
-            if(this.props.thread) {
-                window.location.pathname = '/' + req_data.lang + '/' + req_data.board + '/' + data._id;
+        Request(url, req_data, 'POST', this, function(thread_addr) {
+            if(self.props.thread) {
+                window.location.pathname = '/' + req_data.lang + '/' + req_data.board + '/' + thread_addr;
             }
             else {
                 toast('Post successfuly created!');
                 self.setState({
                     textValue: ''
                 });
+                self.props.refresh();
             }
         }, function() {
             toast('Server error!', true);
@@ -106,7 +108,7 @@ export var Posting = React.createClass({
             <button className="btn btn-primary" data-toggle="collapse" data-target="#posting">{this.props.button}</button>
             <article id="posting" className="collapse">
                 <textarea className="form-control" placeholder="Your post..." value={this.state.textValue} onChange={this.handleChange}></textarea>
-                <button className="btn btn-primary btn-sm">Submit</button>
+                <button className="btn btn-primary btn-sm" onClick={this.submitForm}>Submit</button>
             </article>
         </article>;
     }

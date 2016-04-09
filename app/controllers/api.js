@@ -146,8 +146,8 @@ class ApiController {
         });
     }
     create_thread(req, res, next) {
-        var lang = req.params.lang;
-        var board = req.params.board;
+        var lang = req.body.lang;
+        var board = req.body.board;
         var text = req.body.content;
         var time_now = new Date();
         models.Post.create({
@@ -165,9 +165,9 @@ class ApiController {
         });
     }
     create_post(req, res, next) {
-        var lang = req.params.lang;
-        var board = req.params.board;
-        var thread = req.params.thread;
+        var lang = req.body.lang;
+        var board = req.body.board;
+        var thread = req.body.thread;
         var text = req.body.content;
         var time_now = new Date();
         models.Post.create({

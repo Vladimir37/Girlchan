@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {Router} from "react-router";
 import $ from 'jquery';
+
 import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting} from './templates.js';
 import {Request, toast} from './utils.js';
 
@@ -20,6 +22,7 @@ var Thread = React.createClass({
 });
 
 export var Board = React.createClass({
+    mixins: [ Router.State ],
     getInitialState() {
         return {
             loaded_threads: false,
@@ -78,7 +81,7 @@ export var Board = React.createClass({
                 return <Thread data={thread} />
             });
             return <article className="threads_list">
-                <Posting button="Create thread" addr="create_thread" />
+                <Posting button="Create thread" addr="create_thread" thread="true" param={this.props.params}/>
                 {threads_arr}
             </article>;
         }

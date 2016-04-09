@@ -37431,10 +37431,6 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _toastr = __webpack_require__(2);
-
-	var _toastr2 = _interopRequireDefault(_toastr);
-
 	var _board_c = __webpack_require__(233);
 
 	var _thread_c = __webpack_require__(236);
@@ -37442,12 +37438,11 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	$(document).ready(function () {
-	    _toastr2.default["warning"]("Inconceivable!");
 	    _reactDom2.default.render(_react2.default.createElement(
 	        _reactRouter.Router,
 	        { history: _reactRouter.browserHistory },
 	        _react2.default.createElement(_reactRouter.Route, { path: "/:lang/:board", component: _board_c.Board }),
-	        _react2.default.createElement(_reactRouter.Route, { path: "/:lang/:board/:thread", component: _board_c.Board })
+	        _react2.default.createElement(_reactRouter.Route, { path: "/:lang/:board/:thread", component: _thread_c.Thread })
 	    ), document.getElementsByClassName('main_content')[0]);
 	});
 	//<Route path="/" component={}></Route>
@@ -37472,6 +37467,8 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
+	var _reactRouter = __webpack_require__(175);
+
 	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
@@ -37479,8 +37476,6 @@
 	var _templates = __webpack_require__(234);
 
 	var _utils = __webpack_require__(235);
-
-	var _utils2 = _interopRequireDefault(_utils);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -37504,6 +37499,8 @@
 
 	var Board = exports.Board = _react2.default.createClass({
 	    displayName: 'Board',
+
+	    mixins: [_reactRouter.Router.State],
 	    getInitialState: function getInitialState() {
 	        return {
 	            loaded_threads: false,
@@ -37521,7 +37518,7 @@
 	            lang: this.props.params.lang,
 	            board: this.props.params.board
 	        };
-	        (0, _utils2.default)('/api/page', req_data, 'GET', self, function (threads) {
+	        (0, _utils.Request)('/api/page', req_data, 'GET', self, function (threads) {
 	            self.setState({
 	                loaded_threads: true,
 	                threads: threads
@@ -37535,7 +37532,7 @@
 	            board: this.props.params.board,
 	            threads: JSON.stringify(self.state.threads.slice(self.state.start, self.state.limit))
 	        };
-	        (0, _utils2.default)('/api/short_threads', req_data, 'GET', self, function (threads) {
+	        (0, _utils.Request)('/api/short_threads', req_data, 'GET', self, function (threads) {
 	            self.setState({
 	                loaded_content: true,
 	                content: self.state.content.concat(threads),
@@ -37559,7 +37556,7 @@
 	            return _react2.default.createElement(
 	                'article',
 	                { className: 'threads_list' },
-	                _react2.default.createElement(_templates.Posting, { button: 'Create thread', addr: 'create_thread' }),
+	                _react2.default.createElement(_templates.Posting, { button: 'Create thread', addr: 'create_thread', thread: 'true', param: this.props.params }),
 	                threads_arr
 	            );
 	        }
@@ -37585,9 +37582,9 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _utils = __webpack_require__(235);
+	var _reactRouter = __webpack_require__(175);
 
-	var _utils2 = _interopRequireDefault(_utils);
+	var _utils = __webpack_require__(235);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -37710,13 +37707,31 @@
 	        };
 	    },
 	    submitForm: function submitForm() {
+	        if (!this.state.textValue) {
+	            (0, _utils.toast)('Required fields are empty!', true);
+	            return false;
+	        }
+	        var self = this;
 	        var url = "/api/" + this.props.addr;
 	        var req_data = {
-	            lang: this.props.params.lang,
-	            board: this.props.params.board,
-	            thread: this.props.params.thread
+	            lang: this.props.param.lang,
+	            board: this.props.param.board,
+	            content: this.state.textValue,
+	            thread: this.props.param.thread
 	        };
-	        (0, _utils2.default)(url, req_data, 'POST', this);
+	        (0, _utils.Request)(url, req_data, 'POST', this, function (thread_addr) {
+	            if (self.props.thread) {
+	                window.location.pathname = '/' + req_data.lang + '/' + req_data.board + '/' + thread_addr;
+	            } else {
+	                (0, _utils.toast)('Post successfuly created!');
+	                self.setState({
+	                    textValue: ''
+	                });
+	                self.props.refresh();
+	            }
+	        }, function () {
+	            (0, _utils.toast)('Server error!', true);
+	        });
 	    },
 	    handleChange: function handleChange(event) {
 	        this.setState({
@@ -37738,7 +37753,7 @@
 	                _react2.default.createElement('textarea', { className: 'form-control', placeholder: 'Your post...', value: this.state.textValue, onChange: this.handleChange }),
 	                _react2.default.createElement(
 	                    'button',
-	                    { className: 'btn btn-primary btn-sm' },
+	                    { className: 'btn btn-primary btn-sm', onClick: this.submitForm },
 	                    'Submit'
 	                )
 	            )
@@ -37750,11 +37765,20 @@
 /* 235 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function($) {'use strict';
+	/* WEBPACK VAR INJECTION */(function($) {"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	exports.Request = undefined;
+	exports.toast = toast;
+
+	var _toastr = __webpack_require__(2);
+
+	var _toastr2 = _interopRequireDefault(_toastr);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	function error_handling(context) {
 	    return function (err) {
 	        console.log(err);
@@ -37764,7 +37788,7 @@
 	    };
 	}
 
-	function _default(url, data, type, context, _success, _error) {
+	function Request(url, data, type, context, _success, _error) {
 	    var emptyFunction = function emptyFunction() {};
 	    console.log(url);
 	    _success = _success || emptyFunction;
@@ -37791,8 +37815,30 @@
 	            }
 	        }
 	    });
-	}exports.default = _default;
+	}exports.Request = Request;
 	;
+
+	function toast(text, is_bad) {
+	    _toastr2.default.options = {
+	        "closeButton": true,
+	        "debug": false,
+	        "newestOnTop": true,
+	        "progressBar": false,
+	        "positionClass": "toast-top-right",
+	        "preventDuplicates": false,
+	        "onclick": null,
+	        "showDuration": "300",
+	        "hideDuration": "1000",
+	        "timeOut": "5000",
+	        "extendedTimeOut": "1000",
+	        "showEasing": "swing",
+	        "hideEasing": "linear",
+	        "showMethod": "fadeIn",
+	        "hideMethod": "fadeOut"
+	    };
+	    var type = is_bad ? "error" : "success";
+	    _toastr2.default[type](text);
+	}
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
@@ -37814,6 +37860,8 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
+	var _reactRouter = __webpack_require__(175);
+
 	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
@@ -37822,12 +37870,12 @@
 
 	var _utils = __webpack_require__(235);
 
-	var _utils2 = _interopRequireDefault(_utils);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Thread = exports.Thread = _react2.default.createClass({
 	    displayName: 'Thread',
+
+	    mixins: [_reactRouter.Router.State],
 	    getInitialState: function getInitialState() {
 	        return {
 	            loaded_thread: false,
@@ -37845,7 +37893,7 @@
 	            board: this.props.params.board,
 	            thread: this.props.params.thread
 	        };
-	        (0, _utils2.default)('/api/full_thread', req_data, 'GET', self, function (thread) {
+	        (0, _utils.Request)('/api/full_thread', req_data, 'GET', self, function (thread) {
 	            self.setState({
 	                loaded_thread: true,
 	                first_post: thread.op_post,
@@ -37865,7 +37913,7 @@
 	            thread: this.props.params.thread,
 	            count: this.state.count
 	        };
-	        (0, _utils2.default)('/api/new_posts', req_data, 'GET', self, function (new_posts) {
+	        (0, _utils.Request)('/api/new_posts', req_data, 'GET', self, function (new_posts) {
 	            var all_posts = self.state.posts.concat(new_posts);
 	            self.setState({
 	                loading: false,
@@ -37899,7 +37947,8 @@
 	                { className: 'full_thread' },
 	                _react2.default.createElement(_templates.FirstPost, { data: this.state.first_post }),
 	                posts_arr,
-	                footer
+	                footer,
+	                _react2.default.createElement(_templates.Posting, { button: 'Create post', addr: 'create_post', refresh: this.getNewPosts, param: this.props.params })
 	            );
 	        }
 	    }

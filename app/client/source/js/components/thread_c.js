@@ -1,10 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {Router} from "react-router";
 import $ from 'jquery';
-import {Post, FirstPost, NotFound, ServerError, PleaseWait} from './templates.js';
+
+import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting} from './templates.js';
 import {Request, toast} from './utils.js';
 
 export var Thread = React.createClass({
+    mixins: [ Router.State ],
     getInitialState() {
         return {
             loaded_thread: false,
@@ -74,6 +77,7 @@ export var Thread = React.createClass({
                 <FirstPost data={this.state.first_post} />
                 {posts_arr}
                 {footer}
+                <Posting button="Create post" addr="create_post" refresh={this.getNewPosts} param={this.props.params} />
             </section>;
         }
     }
