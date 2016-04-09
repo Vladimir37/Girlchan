@@ -37433,7 +37433,7 @@
 
 	var _board_c = __webpack_require__(233);
 
-	var _thread_c = __webpack_require__(236);
+	var _thread_c = __webpack_require__(237);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -37475,7 +37475,7 @@
 
 	var _templates = __webpack_require__(234);
 
-	var _utils = __webpack_require__(235);
+	var _utils = __webpack_require__(236);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -37484,28 +37484,45 @@
 	    getInitialState: function getInitialState() {
 	        return {
 	            posts: this.props.data.posts,
-	            count: this.props.data.posts.length
+	            count_loaded: this.props.data.posts.length,
+	            count_full: this.props.data.count
 	        };
 	    },
-	    morePosts: function morePosts() {
+	    getMorePosts: function getMorePosts() {
 	        var self = this;
 	        var req_data = {
 	            lang: this.props.param.lang,
 	            board: this.props.param.board,
 	            thread: this.props.data.op_post._id,
-	            skip: this.state.count,
+	            skip: this.state.count_loaded,
 	            limit: 5
 	        };
 	        (0, _utils.Request)('/api/posts', req_data, 'GET', self, function (posts) {
 	            self.setState({
 	                posts: posts.concat(self.state.posts),
-	                count: self.state.count + posts.length
+	                count_loaded: self.state.count_loaded + posts.length
+	            });
+	        });
+	    },
+	    getNewPosts: function getNewPosts() {
+	        var self = this;
+	        var req_data = {
+	            lang: this.props.param.lang,
+	            board: this.props.param.board,
+	            thread: this.props.data.op_post._id,
+	            count: this.state.count_full
+	        };
+	        (0, _utils.Request)('/api/new_posts', req_data, 'GET', self, function (posts) {
+	            self.setState({
+	                posts: self.state.posts.concat(posts),
+	                count_full: self.state.count_full + posts.length,
+	                count_loaded: self.state.count_loaded + posts.length
 	            });
 	        });
 	    },
 	    render: function render() {
 	        var count_panel = '';
-	        if (this.props.data.count - this.state.count > 0) {
+	        if (this.state.count_full - this.state.count_loaded > 0) {
 	            count_panel = _react2.default.createElement(
 	                'article',
 	                { className: 'list-group count_panel' },
@@ -37513,16 +37530,21 @@
 	                    'li',
 	                    { className: 'list-group-item' },
 	                    'And ',
-	                    this.props.data.count - this.state.count,
+	                    this.state.count_full - this.state.count_loaded,
 	                    ' another posts...'
 	                ),
 	                _react2.default.createElement(
 	                    'li',
-	                    { className: 'list-group-item more_posts', onClick: this.morePosts },
+	                    { className: 'list-group-item more_posts', onClick: this.getMorePosts },
 	                    'Load more'
 	                )
 	            );
 	        }
+	        var params = {
+	            lang: this.props.param.lang,
+	            board: this.props.param.board,
+	            thread: this.props.data.op_post._id
+	        };
 	        var posts_arr = this.state.posts.map(function (post) {
 	            return _react2.default.createElement(_templates.Post, { data: post });
 	        });
@@ -37531,7 +37553,8 @@
 	            { className: 'thread' },
 	            _react2.default.createElement(_templates.FirstPost, { data: this.props.data.op_post, param: this.props.param, read: 'true' }),
 	            count_panel,
-	            posts_arr
+	            posts_arr,
+	            _react2.default.createElement(_templates.Posting, { button: 'Reply to this topic', addr: 'create_post', refresh: this.getNewPosts, param: params, small: 'true' })
 	        );
 	    }
 	});
@@ -37625,7 +37648,11 @@
 
 	var _reactRouter = __webpack_require__(175);
 
-	var _utils = __webpack_require__(235);
+	var _randomToken = __webpack_require__(235);
+
+	var _randomToken2 = _interopRequireDefault(_randomToken);
+
+	var _utils = __webpack_require__(236);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -37794,17 +37821,23 @@
 	        });
 	    },
 	    render: function render() {
+	        var className = this.props.small ? 'post_form' : 'thread_form';
+	        var target_id = 'target_' + (0, _randomToken2.default)(16);
 	        return _react2.default.createElement(
 	            'article',
-	            { className: 'posting_form' },
+	            { className: "panel panel-info posting_form " + className },
 	            _react2.default.createElement(
-	                'button',
-	                { className: 'btn btn-primary', 'data-toggle': 'collapse', 'data-target': '#posting' },
-	                this.props.button
+	                'article',
+	                { className: 'panel-heading', 'data-toggle': 'collapse', 'data-target': '#' + target_id },
+	                _react2.default.createElement(
+	                    'h3',
+	                    { className: 'panel-title' },
+	                    this.props.button
+	                )
 	            ),
 	            _react2.default.createElement(
 	                'article',
-	                { id: 'posting', className: 'collapse' },
+	                { id: target_id, className: 'collapse panel-body' },
 	                _react2.default.createElement('textarea', { className: 'form-control', placeholder: 'Your post...', value: this.state.textValue, onChange: this.handleChange }),
 	                _react2.default.createElement(
 	                    'button',
@@ -37818,6 +37851,47 @@
 
 /***/ },
 /* 235 */
+/***/ function(module, exports) {
+
+	void function(root){
+
+	    // return a number between 0 and max-1
+	    function r(max){ return Math.floor(Math.random()*max) }
+
+	    function generate(salt, size){
+	        var key = ''
+	        var sl = salt.length
+	        while ( size -- ) {
+	            var rnd = r(sl)
+	            key += salt[rnd]
+	        }
+	        return key
+	    }
+
+	    var rndtok = function(salt, size){
+	        return isNaN(size) ? undefined :
+	               size < 1    ? undefined : generate(salt, size)
+
+	    }
+
+	    rndtok.gen = createGenerator
+
+	    function createGenerator(salt){
+	        salt = typeof salt  == 'string' && salt.length > 0 ? salt :  'abcdefghijklmnopqrstuvwxzy0123456789'
+	        var temp = rndtok.bind(rndtok, salt)
+	        temp.salt = function(){ return salt }
+	        temp.create = createGenerator
+	        temp.gen = createGenerator
+	        return temp
+	    }
+
+	    module.exports = createGenerator()
+
+	}(this)
+
+
+/***/ },
+/* 236 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {"use strict";
@@ -37897,7 +37971,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 236 */
+/* 237 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37923,7 +37997,7 @@
 
 	var _templates = __webpack_require__(234);
 
-	var _utils = __webpack_require__(235);
+	var _utils = __webpack_require__(236);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 

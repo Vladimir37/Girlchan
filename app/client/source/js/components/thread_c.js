@@ -7,7 +7,7 @@ import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting} from './tem
 import {Request, toast} from './utils.js';
 
 export var Thread = React.createClass({
-    mixins: [ Router.State ],
+    mixins: [Router.State],
     getInitialState() {
         return {
             loaded_thread: false,
@@ -71,7 +71,7 @@ export var Thread = React.createClass({
                 footer = <img src="/src/images/main/load.gif" alt="loading_footer" />;
             }
             else {
-                footer = <button className="btn btn-primary" onClick={this.getNewPosts}>Load more!</button>;
+                footer = <button className="btn btn-primary" onClick={this.getNewPosts}>Load new!</button>;
             }
             return <section className="full_thread">
                 <FirstPost data={this.state.first_post} />

@@ -8,18 +8,35 @@
 .loading {
     text-align: center;
 }
+.panel {
+    clear: both;
+}
 .posting_form {
     text-align: center;
-    border: 1px solid #e53c37;
-    border-radius: 4px;
-    padding: 15px;
-    margin: 4px 0;
+}
+.thread_form {
+    width: 650px;
+    margin: 0 auto;
+    margin-bottom: 15px;
+}
+.post_form {
+    width: 350px;
+    float: right;
+}
+.posting_form .panel-heading {
+    cursor: pointer;
 }
 .posting_form textarea {
-    width: 650px;
-    height: 220px;
     resize: none;
     margin: 10px auto;
+}
+.thread_form textarea {
+    width: 500px;
+    height: 220px;
+}
+.post_form textarea {
+    width: 300px;
+    height: 120px;
 }
 .btn {
     outline: none;
@@ -46,4 +63,7 @@
     cursor: pointer;
     color: white;
     background: #777777;
+}
+.clearfix {
+    clear: both;
 }

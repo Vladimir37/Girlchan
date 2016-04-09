@@ -10,33 +10,55 @@ var Thread = React.createClass({
     getInitialState() {
         return {
             posts: this.props.data.posts,
-            count: this.props.data.posts.length
+            count_loaded: this.props.data.posts.length,
+            count_full: this.props.data.count
         };
     },
-    morePosts() {
+    getMorePosts() {
         var self = this;
         var req_data = {
             lang: this.props.param.lang,
             board: this.props.param.board,
             thread: this.props.data.op_post._id,
-            skip: this.state.count,
+            skip: this.state.count_loaded,
             limit: 5
         };
         Request('/api/posts', req_data, 'GET', self, function(posts) {
             self.setState({
                 posts: posts.concat(self.state.posts),
-                count: self.state.count + posts.length
+                count_loaded: self.state.count_loaded + posts.length
             });
-        })
+        });
+    },
+    getNewPosts() {
+        var self = this;
+        var req_data = {
+            lang: this.props.param.lang,
+            board: this.props.param.board,
+            thread: this.props.data.op_post._id,
+            count: this.state.count_full
+        };
+        Request('/api/new_posts', req_data, 'GET', self, function(posts) {
+            self.setState({
+                posts: self.state.posts.concat(posts),
+                count_full: self.state.count_full + posts.length,
+                count_loaded: self.state.count_loaded + posts.length
+            });
+        });
     },
     render() {
         var count_panel = '';
-        if(this.props.data.count - this.state.count > 0) {
+        if(this.state.count_full - this.state.count_loaded > 0) {
             count_panel = <article className="list-group count_panel">
-                <li className="list-group-item">And {this.props.data.count - this.state.count} another posts...</li>
-                <li className="list-group-item more_posts" onClick={this.morePosts}>Load more</li>
+                <li className="list-group-item">And {this.state.count_full - this.state.count_loaded} another posts...</li>
+                <li className="list-group-item more_posts" onClick={this.getMorePosts}>Load more</li>
             </article>;
         }
+        var params = {
+            lang: this.props.param.lang,
+            board: this.props.param.board,
+            thread: this.props.data.op_post._id
+        };
         var posts_arr = this.state.posts.map(function(post) {
             return <Post data={post} />;
         });
@@ -44,12 +66,13 @@ var Thread = React.createClass({
             <FirstPost data={this.props.data.op_post} param={this.props.param} read="true" />
             {count_panel}
             {posts_arr}
+            <Posting button="Reply to this topic" addr="create_post" refresh={this.getNewPosts} param={params} small="true" />
         </section>;
     }
 });
 
 export var Board = React.createClass({
-    mixins: [ Router.State ],
+    mixins: [Router.State],
     getInitialState() {
         return {
             loaded_threads: false,

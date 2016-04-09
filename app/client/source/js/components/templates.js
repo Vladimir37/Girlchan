@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Router} from "react-router";
+import Random from "random-token";
 
 import {Request, toast} from './utils.js';
 
@@ -110,9 +111,13 @@ export var Posting = React.createClass({
         });
     },
     render() {
-        return <article className="posting_form">
-            <button className="btn btn-primary" data-toggle="collapse" data-target="#posting">{this.props.button}</button>
-            <article id="posting" className="collapse">
+        var className = this.props.small ? 'post_form' : 'thread_form';
+        var target_id = 'target_' + Random(16);
+        return <article className={"panel panel-info posting_form " + className}>
+            <article className="panel-heading" data-toggle="collapse" data-target={'#' + target_id}>
+                <h3 className="panel-title">{this.props.button}</h3>
+            </article>
+            <article id={target_id} className="collapse panel-body">
                 <textarea className="form-control" placeholder="Your post..." value={this.state.textValue} onChange={this.handleChange}></textarea>
                 <button className="btn btn-primary btn-sm" onClick={this.submitForm}>Submit</button>
             </article>
