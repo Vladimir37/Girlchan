@@ -37482,16 +37482,55 @@
 	var Thread = _react2.default.createClass({
 	    displayName: 'Thread',
 	    getInitialState: function getInitialState() {
-	        return null;
+	        return {
+	            posts: this.props.data.posts,
+	            count: this.props.data.posts.length
+	        };
+	    },
+	    morePosts: function morePosts() {
+	        var self = this;
+	        var req_data = {
+	            lang: this.props.param.lang,
+	            board: this.props.param.board,
+	            thread: this.props.data.op_post._id,
+	            skip: this.state.count,
+	            limit: 5
+	        };
+	        (0, _utils.Request)('/api/posts', req_data, 'GET', self, function (posts) {
+	            self.setState({
+	                posts: posts.concat(self.state.posts),
+	                count: self.state.count + posts.length
+	            });
+	        });
 	    },
 	    render: function render() {
-	        var posts_arr = this.props.data.posts.map(function (post) {
+	        var count_panel = '';
+	        if (this.props.data.count - this.state.count > 0) {
+	            count_panel = _react2.default.createElement(
+	                'article',
+	                { className: 'list-group count_panel' },
+	                _react2.default.createElement(
+	                    'li',
+	                    { className: 'list-group-item' },
+	                    'And ',
+	                    this.props.data.count - this.state.count,
+	                    ' another posts...'
+	                ),
+	                _react2.default.createElement(
+	                    'li',
+	                    { className: 'list-group-item more_posts', onClick: this.morePosts },
+	                    'Load more'
+	                )
+	            );
+	        }
+	        var posts_arr = this.state.posts.map(function (post) {
 	            return _react2.default.createElement(_templates.Post, { data: post });
 	        });
 	        return _react2.default.createElement(
 	            'section',
 	            { className: 'thread' },
 	            _react2.default.createElement(_templates.FirstPost, { data: this.props.data.op_post, param: this.props.param, read: 'true' }),
+	            count_panel,
 	            posts_arr
 	        );
 	    }
@@ -37806,7 +37845,6 @@
 
 	function Request(url, data, type, context, _success, _error) {
 	    var emptyFunction = function emptyFunction() {};
-	    console.log(url);
 	    _success = _success || emptyFunction;
 	    if (_error) {
 	        _error = function error(err) {
@@ -37822,12 +37860,13 @@
 	        type: type,
 	        data: data,
 	        dataType: 'json',
-	        error: error_handling(context),
+	        error: _error(context),
 	        success: function success(data) {
+	            console.log(data);
 	            if (data.status == 0) {
 	                _success(data.body);
 	            } else {
-	                error_handling(context)(data.status);
+	                _error(context)(data.status);
 	            }
 	        }
 	    });

@@ -141,7 +141,7 @@ class ApiController {
             answer: true,
             thread: thread
         }).sort({
-            time: -1
+            time: 1
         }).skip(count).then(function(posts) {
             res.end(serialize(0, posts));
         }).catch(function(err) {

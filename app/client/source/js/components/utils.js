@@ -11,7 +11,6 @@ function error_handling(context) {
 
 export function Request(url, data, type, context, success, error) {
     var emptyFunction = function(){};
-    console.log(url);
     success = success || emptyFunction;
     if(error) {
         error = function(err) {
@@ -28,13 +27,14 @@ export function Request(url, data, type, context, success, error) {
         type,
         data,
         dataType: 'json',
-        error: error_handling(context),
+        error: error(context),
         success(data) {
+            console.log(data);
             if(data.status == 0) {
                 success(data.body);
             }
             else {
-                error_handling(context)(data.status);
+                error(context)(data.status);
             }
         }
     });
