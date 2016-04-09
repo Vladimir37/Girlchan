@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import {Request, toast} from './utils.js';
+
 export var NotFound = React.createClass({
     getInitialState() {
         return null;
@@ -63,16 +65,48 @@ export var Post = React.createClass({
 
 export var Posting = React.createClass({
     getInitialState() {
-        return null;
+        return {
+            textValue: ''
+        };
+    },
+    submitForm() {
+        if(!this.state.textValue) {
+            toast('Required fields are empty!', true);
+            return false;
+        }
+        var self = this;
+        var url = "/api/" + this.props.addr;
+        var req_data = {
+            lang: this.props.params.lang,
+            board: this.props.params.board,
+            content: this.state.textValue,
+            thread: this.props.params.thread
+        };
+        Request(url, req_data, 'POST', this, function(data) {
+            if(this.props.thread) {
+                window.location.pathname = '/' + req_data.lang + '/' + req_data.board + '/' + data._id;
+            }
+            else {
+                toast('Post successfuly created!');
+                self.setState({
+                    textValue: ''
+                });
+            }
+        }, function() {
+            toast('Server error!', true);
+        });
+    },
+    handleChange(event) {
+        this.setState({
+            textValue: event.target.value
+        });
     },
     render() {
         return <article className="posting_form">
             <button className="btn btn-primary" data-toggle="collapse" data-target="#posting">{this.props.button}</button>
             <article id="posting" className="collapse">
-                <from method="POST" action={"/api/" + this.props.addr}>
-                    <textarea className="form-control" placeholder="Your post..." required></textarea>
-                    <button className="btn btn-primary btn-sm">Submit</button>
-                </from>
+                <textarea className="form-control" placeholder="Your post..." value={this.state.textValue} onChange={this.handleChange}></textarea>
+                <button className="btn btn-primary btn-sm">Submit</button>
             </article>
         </article>;
     }

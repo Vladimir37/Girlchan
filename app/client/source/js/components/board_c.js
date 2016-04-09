@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting} from './templates.js';
-import Request from './utils.js';
+import {Request, toast} from './utils.js';
 
 var Thread = React.createClass({
     getInitialState() {
@@ -31,7 +31,7 @@ export var Board = React.createClass({
             start: 0
         };
     },
-    get_threads() {
+    getThreads() {
         var self = this;
         var req_data = {
             lang: this.props.params.lang,
@@ -46,7 +46,7 @@ export var Board = React.createClass({
             });
         });
     },
-    get_content() {
+    getContent() {
         var self = this;
         var req_data = {
             lang: this.props.params.lang,
@@ -65,12 +65,12 @@ export var Board = React.createClass({
         if(this.state.error) {
             return <ServerError />;
         }
-        else if(!this.state.error && !this.state.loaded_threads) {
-            this.get_threads();
+        else if(!this.state.loaded_threads) {
+            this.getThreads();
             return <PleaseWait />;
         }
-        else if(!this.state.error && !this.state.loaded_content) {
-            this.get_content();
+        else if(!this.state.loaded_content) {
+            this.getContent();
             return <PleaseWait />;
         }
         else {

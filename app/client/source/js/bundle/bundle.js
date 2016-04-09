@@ -37431,6 +37431,10 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
+	var _toastr = __webpack_require__(2);
+
+	var _toastr2 = _interopRequireDefault(_toastr);
+
 	var _board_c = __webpack_require__(233);
 
 	var _thread_c = __webpack_require__(236);
@@ -37438,6 +37442,7 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	$(document).ready(function () {
+	    _toastr2.default["warning"]("Inconceivable!");
 	    _reactDom2.default.render(_react2.default.createElement(
 	        _reactRouter.Router,
 	        { history: _reactRouter.browserHistory },
@@ -37510,7 +37515,7 @@
 	            start: 0
 	        };
 	    },
-	    get_threads: function get_threads() {
+	    getThreads: function getThreads() {
 	        var self = this;
 	        var req_data = {
 	            lang: this.props.params.lang,
@@ -37523,7 +37528,7 @@
 	            }, function (err) {});
 	        });
 	    },
-	    get_content: function get_content() {
+	    getContent: function getContent() {
 	        var self = this;
 	        var req_data = {
 	            lang: this.props.params.lang,
@@ -37541,11 +37546,11 @@
 	    render: function render() {
 	        if (this.state.error) {
 	            return _react2.default.createElement(_templates.ServerError, null);
-	        } else if (!this.state.error && !this.state.loaded_threads) {
-	            this.get_threads();
+	        } else if (!this.state.loaded_threads) {
+	            this.getThreads();
 	            return _react2.default.createElement(_templates.PleaseWait, null);
-	        } else if (!this.state.error && !this.state.loaded_content) {
-	            this.get_content();
+	        } else if (!this.state.loaded_content) {
+	            this.getContent();
 	            return _react2.default.createElement(_templates.PleaseWait, null);
 	        } else {
 	            var threads_arr = this.state.content.map(function (thread) {
@@ -37579,6 +37584,10 @@
 	var _reactDom = __webpack_require__(174);
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _utils = __webpack_require__(235);
+
+	var _utils2 = _interopRequireDefault(_utils);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -37696,7 +37705,23 @@
 	var Posting = exports.Posting = _react2.default.createClass({
 	    displayName: 'Posting',
 	    getInitialState: function getInitialState() {
-	        return null;
+	        return {
+	            textValue: ''
+	        };
+	    },
+	    submitForm: function submitForm() {
+	        var url = "/api/" + this.props.addr;
+	        var req_data = {
+	            lang: this.props.params.lang,
+	            board: this.props.params.board,
+	            thread: this.props.params.thread
+	        };
+	        (0, _utils2.default)(url, req_data, 'POST', this);
+	    },
+	    handleChange: function handleChange(event) {
+	        this.setState({
+	            textValue: event.target.value
+	        });
 	    },
 	    render: function render() {
 	        return _react2.default.createElement(
@@ -37710,15 +37735,11 @@
 	            _react2.default.createElement(
 	                'article',
 	                { id: 'posting', className: 'collapse' },
+	                _react2.default.createElement('textarea', { className: 'form-control', placeholder: 'Your post...', value: this.state.textValue, onChange: this.handleChange }),
 	                _react2.default.createElement(
-	                    'from',
-	                    { method: 'POST', action: "/api/" + this.props.addr },
-	                    _react2.default.createElement('textarea', { className: 'form-control', placeholder: 'Your post...', required: true }),
-	                    _react2.default.createElement(
-	                        'button',
-	                        { className: 'btn btn-primary btn-sm' },
-	                        'Submit'
-	                    )
+	                    'button',
+	                    { className: 'btn btn-primary btn-sm' },
+	                    'Submit'
 	                )
 	            )
 	        );
@@ -37743,10 +37764,18 @@
 	    };
 	}
 
-	function _default(url, data, type, context, _success) {
+	function _default(url, data, type, context, _success, _error) {
 	    var emptyFunction = function emptyFunction() {};
 	    console.log(url);
 	    _success = _success || emptyFunction;
+	    if (_error) {
+	        _error = function error(err) {
+	            console.log(err);
+	            return _error;
+	        };
+	    } else {
+	        _error = error_handling;
+	    }
 	    data = data || {};
 	    $.ajax({
 	        url: url,
@@ -37772,6 +37801,11 @@
 
 	'use strict';
 
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.Thread = undefined;
+
 	var _react = __webpack_require__(17);
 
 	var _react2 = _interopRequireDefault(_react);
@@ -37791,6 +37825,85 @@
 	var _utils2 = _interopRequireDefault(_utils);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Thread = exports.Thread = _react2.default.createClass({
+	    displayName: 'Thread',
+	    getInitialState: function getInitialState() {
+	        return {
+	            loaded_thread: false,
+	            loading: false,
+	            error: false,
+	            first_post: null,
+	            posts: [],
+	            count: 0
+	        };
+	    },
+	    getAllPosts: function getAllPosts() {
+	        var self = this;
+	        var req_data = {
+	            lang: this.props.params.lang,
+	            board: this.props.params.board,
+	            thread: this.props.params.thread
+	        };
+	        (0, _utils2.default)('/api/full_thread', req_data, 'GET', self, function (thread) {
+	            self.setState({
+	                loaded_thread: true,
+	                first_post: thread.op_post,
+	                posts: thread.posts,
+	                count: thread.count
+	            });
+	        });
+	    },
+	    getNewPosts: function getNewPosts() {
+	        var self = this;
+	        self.setState({
+	            loading: true
+	        });
+	        var req_data = {
+	            lang: this.props.params.lang,
+	            board: this.props.params.board,
+	            thread: this.props.params.thread,
+	            count: this.state.count
+	        };
+	        (0, _utils2.default)('/api/new_posts', req_data, 'GET', self, function (new_posts) {
+	            var all_posts = self.state.posts.concat(new_posts);
+	            self.setState({
+	                loading: false,
+	                posts: all_posts,
+	                count: all_posts.length
+	            });
+	        });
+	    },
+	    render: function render() {
+	        if (this.state.error) {
+	            return _react2.default.createElement(_templates.ServerError, null);
+	        } else if (!this.state.loaded_thread) {
+	            this.getAllPosts();
+	            return _react2.default.createElement(_templates.PleaseWait, null);
+	        } else {
+	            var posts_arr = this.state.posts.map(function (post) {
+	                return _react2.default.createElement(_templates.Post, { data: post });
+	            });
+	            var footer;
+	            if (this.state.loading) {
+	                footer = _react2.default.createElement('img', { src: '/src/images/main/load.gif', alt: 'loading_footer' });
+	            } else {
+	                footer = _react2.default.createElement(
+	                    'button',
+	                    { className: 'btn btn-primary', onClick: this.getNewPosts },
+	                    'Load more!'
+	                );
+	            }
+	            return _react2.default.createElement(
+	                'section',
+	                { className: 'full_thread' },
+	                _react2.default.createElement(_templates.FirstPost, { data: this.state.first_post }),
+	                posts_arr,
+	                footer
+	            );
+	        }
+	    }
+	});
 
 /***/ }
 /******/ ]);

@@ -122,8 +122,27 @@ class ApiController {
             };
             res.end(serialize(0, result));
         }).catch(function(err) {
-            res.end(serialize(1));
             console.log(err);
+            res.end(serialize(1));
+        });
+    }
+    new_posts(req, res, next) {
+        var lang = req.query.lang;
+        var board = req.query.board;
+        var thread = req.query.thread;
+        var count = req.query.count;
+        models.Post.find({
+            lang,
+            board,
+            answer: true,
+            thread: thread
+        }).sort({
+            time: -1
+        }).skip(count).then(function(posts) {
+            res.end(serialize(0, posts));
+        }).catch(function(err) {
+            console.log(err);
+            res.end(serialize(1));
         });
     }
     create_thread(req, res, next) {
