@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
-import {Post, FirstPost, NotFound, ServerError, PleaseWait} from './templates.js';
+import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting} from './templates.js';
 import Request from './utils.js';
 
 var Thread = React.createClass({
@@ -78,6 +78,7 @@ export var Board = React.createClass({
                 return <Thread data={thread} />
             });
             return <article className="threads_list">
+                <Posting button="Create thread" addr="create_thread" />
                 {threads_arr}
             </article>;
         }

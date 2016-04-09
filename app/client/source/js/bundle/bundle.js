@@ -37431,7 +37431,9 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _board = __webpack_require__(233);
+	var _board_c = __webpack_require__(233);
+
+	var _thread_c = __webpack_require__(236);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -37439,7 +37441,8 @@
 	    _reactDom2.default.render(_react2.default.createElement(
 	        _reactRouter.Router,
 	        { history: _reactRouter.browserHistory },
-	        _react2.default.createElement(_reactRouter.Route, { path: "/:lang/:board", component: _board.Board })
+	        _react2.default.createElement(_reactRouter.Route, { path: "/:lang/:board", component: _board_c.Board }),
+	        _react2.default.createElement(_reactRouter.Route, { path: "/:lang/:board/:thread", component: _board_c.Board })
 	    ), document.getElementsByClassName('main_content')[0]);
 	});
 	//<Route path="/" component={}></Route>
@@ -37551,6 +37554,7 @@
 	            return _react2.default.createElement(
 	                'article',
 	                { className: 'threads_list' },
+	                _react2.default.createElement(_templates.Posting, { button: 'Create thread', addr: 'create_thread' }),
 	                threads_arr
 	            );
 	        }
@@ -37566,7 +37570,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.Post = exports.FirstPost = exports.PleaseWait = exports.ServerError = exports.NotFound = undefined;
+	exports.Posting = exports.Post = exports.FirstPost = exports.PleaseWait = exports.ServerError = exports.NotFound = undefined;
 
 	var _react = __webpack_require__(17);
 
@@ -37689,6 +37693,38 @@
 	    }
 	});
 
+	var Posting = exports.Posting = _react2.default.createClass({
+	    displayName: 'Posting',
+	    getInitialState: function getInitialState() {
+	        return null;
+	    },
+	    render: function render() {
+	        return _react2.default.createElement(
+	            'article',
+	            { className: 'posting_form' },
+	            _react2.default.createElement(
+	                'button',
+	                { className: 'btn btn-primary', 'data-toggle': 'collapse', 'data-target': '#posting' },
+	                this.props.button
+	            ),
+	            _react2.default.createElement(
+	                'article',
+	                { id: 'posting', className: 'collapse' },
+	                _react2.default.createElement(
+	                    'from',
+	                    { method: 'POST', action: "/api/" + this.props.addr },
+	                    _react2.default.createElement('textarea', { className: 'form-control', placeholder: 'Your post...', required: true }),
+	                    _react2.default.createElement(
+	                        'button',
+	                        { className: 'btn btn-primary btn-sm' },
+	                        'Submit'
+	                    )
+	                )
+	            )
+	        );
+	    }
+	});
+
 /***/ },
 /* 235 */
 /***/ function(module, exports, __webpack_require__) {
@@ -37729,6 +37765,32 @@
 	}exports.default = _default;
 	;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 236 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _react = __webpack_require__(17);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(174);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _templates = __webpack_require__(234);
+
+	var _utils = __webpack_require__(235);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }
 /******/ ]);

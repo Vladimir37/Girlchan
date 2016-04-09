@@ -60,3 +60,20 @@ export var Post = React.createClass({
         </article>;
     }
 });
+
+export var Posting = React.createClass({
+    getInitialState() {
+        return null;
+    },
+    render() {
+        return <article className="posting_form">
+            <button className="btn btn-primary" data-toggle="collapse" data-target="#posting">{this.props.button}</button>
+            <article id="posting" className="collapse">
+                <from method="POST" action={"/api/" + this.props.addr}>
+                    <textarea className="form-control" placeholder="Your post..." required></textarea>
+                    <button className="btn btn-primary btn-sm">Submit</button>
+                </from>
+            </article>
+        </article>;
+    }
+});

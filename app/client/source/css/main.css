@@ -8,3 +8,18 @@
 .loading {
     text-align: center;
 }
+.posting_form {
+    text-align: center;
+    border: 1px solid #e53c37;
+    border-radius: 4px;
+    padding: 15px;
+}
+.posting_form textarea {
+    width: 650px;
+    height: 220px;
+    resize: none;
+    margin: 10px auto;
+}
+.btn {
+    outline: none;
+}

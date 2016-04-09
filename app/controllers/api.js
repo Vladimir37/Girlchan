@@ -117,7 +117,8 @@ class ApiController {
         Promise.all([op_post, posts]).then(function(thread_content) {
             var result = {
                 op_post: thread_content[0],
-                posts: thread_content[1]
+                posts: thread_content[1],
+                count: thread_content[1].length
             };
             res.end(serialize(0, result));
         }).catch(function(err) {
@@ -138,7 +139,7 @@ class ApiController {
             text
         }).then(function(new_thread) {
             stacks[lang][board].add_thread(new_thread._id);
-            res.end(serialize(0));
+            res.end(serialize(0, new_thread._id));
         }).catch(function(err) {
             console.log(err);
             res.end(serialize(1));
