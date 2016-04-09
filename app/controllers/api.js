@@ -33,7 +33,6 @@ class ApiController {
         }
     }
     short_threads(req, res, next) {
-        var threads = [];
         var lang = req.query.lang;
         var board = req.query.board;
         var thread_arr;
@@ -43,6 +42,7 @@ class ApiController {
         catch(err) {
             res.end(serialize(2));
         }
+        var threads_promises = [];
         thread_arr.forEach(function(thread_id) {
             var op_post_req = models.Post.findOne({
                 lang,
@@ -63,19 +63,23 @@ class ApiController {
                 answer: true,
                 thread: thread_id
             });
-            Promise.all([op_post_req, posts_req, count_req]).then(function(short_thread_res) {
+            threads_promises.push(Promise.all([op_post_req, posts_req, count_req]));
+        });
+        Promise.all(threads_promises).then(function(short_thread_res_arr) {
+            var threads = [];
+            short_thread_res_arr.forEach(function(short_thread_res) {
                 var short_thread = {
                     op_post: short_thread_res[0],
                     posts: short_thread_res[1].reverse(),
                     count: short_thread_res[2]
                 };
                 threads.push(short_thread);
-            }).catch(function(err) {
-                res.end(serialize(1));
-                console.log(err);
             });
+            res.end(serialize(0, threads));
+        }).catch(function(err) {
+            res.end(serialize(1));
+            console.log(err);
         });
-        res.end(serialize(0, threads));
     }
     posts(req, res, next) {
         var lang = req.query.lang;

@@ -37491,7 +37491,7 @@
 	        return _react2.default.createElement(
 	            'section',
 	            { className: 'thread' },
-	            _react2.default.createElement(_templates.FirstPost, { data: data.op_post }),
+	            _react2.default.createElement(_templates.FirstPost, { data: this.props.data.op_post }),
 	            posts_arr
 	        );
 	    }
@@ -37533,6 +37533,7 @@
 	            threads: JSON.stringify(self.state.threads.slice(self.state.start, self.state.limit))
 	        };
 	        (0, _utils.Request)('/api/short_threads', req_data, 'GET', self, function (threads) {
+	            console.log(threads);
 	            self.setState({
 	                loaded_content: true,
 	                content: self.state.content.concat(threads),

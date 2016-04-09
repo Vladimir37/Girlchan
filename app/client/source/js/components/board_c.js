@@ -15,7 +15,7 @@ var Thread = React.createClass({
             return <Post data={post} />;
         });
         return <section className="thread">
-            <FirstPost data={data.op_post} />
+            <FirstPost data={this.props.data.op_post} />
             {posts_arr}
         </section>;
     }
@@ -57,6 +57,7 @@ export var Board = React.createClass({
             threads: JSON.stringify(self.state.threads.slice(self.state.start, self.state.limit))
         };
         Request('/api/short_threads', req_data, 'GET', self, function(threads) {
+            console.log(threads);
             self.setState({
                 loaded_content: true,
                 content: self.state.content.concat(threads),
