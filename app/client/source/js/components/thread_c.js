@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Router} from "react-router";
 import $ from 'jquery';
+import Moment from "moment";
 
 import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting} from './templates.js';
 import {Request, toast} from './utils.js';
@@ -55,6 +56,7 @@ export var Thread = React.createClass({
         });
     },
     render() {
+        Moment.locale(this.props.params.lang);
         if(this.state.error) {
             return <ServerError />;
         }

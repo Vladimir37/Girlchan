@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Router} from "react-router";
 import Random from "random-token";
+import Moment from "moment";
 
 import {Request, toast} from './utils.js';
 
@@ -53,7 +54,7 @@ export var FirstPost = React.createClass({
             </a>
         }
         return <article className="panel panel-primary">
-            <article className="panel-heading">{this.props.data.time} {read}</article>
+            <article className="panel-heading">{Moment(this.props.data.time).format('LTS L')} {read}</article>
             <article className="panel-body">{this.props.data.text}</article>
         </article>;
     }
@@ -65,7 +66,7 @@ export var Post = React.createClass({
     },
     render() {
         return <article className="panel panel-default post">
-            <article className="panel-heading">{this.props.data.time}</article>
+            <article className="panel-heading">{Moment(this.props.data.time).format('LTS L')}</article>
             <article className="panel-body">{this.props.data.text}</article>
         </article>;
     }

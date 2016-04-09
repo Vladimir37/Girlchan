@@ -66,4 +66,8 @@
 }
 .clearfix {
     clear: both;
+    overflow: hidden;
+}
+.clearfix:after {
+    content: '.';
 }

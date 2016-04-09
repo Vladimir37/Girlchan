@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Router} from "react-router";
 import $ from 'jquery';
+import Moment from "moment";
 
 import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting} from './templates.js';
 import {Request, toast} from './utils.js';
@@ -116,7 +117,7 @@ export var Board = React.createClass({
         });
     },
     render() {
-        var self = this;
+        Moment.locale(this.props.params.lang);
         if(this.state.error) {
             return <ServerError />;
         }
@@ -129,12 +130,14 @@ export var Board = React.createClass({
             return <PleaseWait />;
         }
         else {
+            var self = this;
             var threads_arr = this.state.content.map(function(thread) {
                 return <Thread data={thread} param={self.props.params} />
             });
             return <article className="threads_list">
                 <Posting button="Create thread" addr="create_thread" thread="true" param={this.props.params}/>
                 {threads_arr}
+                <div className="clearfix"></div>
             </article>;
         }
     }
