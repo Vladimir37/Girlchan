@@ -23,3 +23,9 @@
 .btn {
     outline: none;
 }
+.post {
+    margin-left: 50px;
+}
+.full_read_btn {
+    float: right;
+}

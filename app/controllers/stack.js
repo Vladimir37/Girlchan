@@ -13,7 +13,7 @@ class Board {
         }).then(function(threads) {
             var stack = [];
             threads.forEach(function(thread) {
-                stack.push(thread._id);
+                stack.push(thread._id.toString());
             });
             self.stack = stack;
         }).catch(function(err) {
@@ -42,7 +42,7 @@ class Board {
     bump_thread(id) {
         var index = this.stack.indexOf(id);
         if(index != -1) {
-            this.stack.unshift(+this.stack.splice(index, 1));
+            this.stack.unshift(this.stack.splice(index, 1)[0]);
         }
     }
 }

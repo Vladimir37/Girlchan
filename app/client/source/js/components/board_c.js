@@ -15,7 +15,7 @@ var Thread = React.createClass({
             return <Post data={post} />;
         });
         return <section className="thread">
-            <FirstPost data={this.props.data.op_post} />
+            <FirstPost data={this.props.data.op_post} param={this.props.param} read="true" />
             {posts_arr}
         </section>;
     }
@@ -66,6 +66,7 @@ export var Board = React.createClass({
         });
     },
     render() {
+        var self = this;
         if(this.state.error) {
             return <ServerError />;
         }
@@ -79,7 +80,7 @@ export var Board = React.createClass({
         }
         else {
             var threads_arr = this.state.content.map(function(thread) {
-                return <Thread data={thread} />
+                return <Thread data={thread} param={self.props.params} />
             });
             return <article className="threads_list">
                 <Posting button="Create thread" addr="create_thread" thread="true" param={this.props.params}/>

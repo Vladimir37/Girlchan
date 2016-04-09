@@ -37491,7 +37491,7 @@
 	        return _react2.default.createElement(
 	            'section',
 	            { className: 'thread' },
-	            _react2.default.createElement(_templates.FirstPost, { data: this.props.data.op_post }),
+	            _react2.default.createElement(_templates.FirstPost, { data: this.props.data.op_post, param: this.props.param, read: 'true' }),
 	            posts_arr
 	        );
 	    }
@@ -37542,6 +37542,7 @@
 	        });
 	    },
 	    render: function render() {
+	        var self = this;
 	        if (this.state.error) {
 	            return _react2.default.createElement(_templates.ServerError, null);
 	        } else if (!this.state.loaded_threads) {
@@ -37552,7 +37553,7 @@
 	            return _react2.default.createElement(_templates.PleaseWait, null);
 	        } else {
 	            var threads_arr = this.state.content.map(function (thread) {
-	                return _react2.default.createElement(Thread, { data: thread });
+	                return _react2.default.createElement(Thread, { data: thread, param: self.props.params });
 	            });
 	            return _react2.default.createElement(
 	                'article',
@@ -37660,13 +37661,27 @@
 	        return null;
 	    },
 	    render: function render() {
+	        var read = '';
+	        if (this.props.read) {
+	            read = _react2.default.createElement(
+	                'a',
+	                { href: "/" + this.props.param.lang + "/" + this.props.param.board + "/" + this.props.data._id },
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: 'btn btn-xs full_read_btn' },
+	                    'Read'
+	                )
+	            );
+	        }
 	        return _react2.default.createElement(
 	            'article',
 	            { className: 'panel panel-primary' },
 	            _react2.default.createElement(
 	                'article',
 	                { className: 'panel-heading' },
-	                this.props.data.time
+	                this.props.data.time,
+	                ' ',
+	                read
 	            ),
 	            _react2.default.createElement(
 	                'article',
@@ -37685,7 +37700,7 @@
 	    render: function render() {
 	        return _react2.default.createElement(
 	            'article',
-	            { className: 'panel panel-default' },
+	            { className: 'panel panel-default post' },
 	            _react2.default.createElement(
 	                'article',
 	                { className: 'panel-heading' },

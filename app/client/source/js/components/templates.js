@@ -45,8 +45,14 @@ export var FirstPost = React.createClass({
         return null;
     },
     render() {
+        var read = '';
+        if(this.props.read) {
+            read = <a href={"/" + this.props.param.lang + "/" + this.props.param.board + "/" + this.props.data._id}>
+                <button className="btn btn-xs full_read_btn">Read</button>
+            </a>
+        }
         return <article className="panel panel-primary">
-            <article className="panel-heading">{this.props.data.time}</article>
+            <article className="panel-heading">{this.props.data.time} {read}</article>
             <article className="panel-body">{this.props.data.text}</article>
         </article>;
     }
@@ -57,7 +63,7 @@ export var Post = React.createClass({
         return null;
     },
     render() {
-        return <article className="panel panel-default">
+        return <article className="panel panel-default post">
             <article className="panel-heading">{this.props.data.time}</article>
             <article className="panel-body">{this.props.data.text}</article>
         </article>;
