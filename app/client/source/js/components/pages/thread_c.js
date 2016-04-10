@@ -4,7 +4,7 @@ import {Router} from "react-router";
 import $ from 'jquery';
 import Moment from "moment";
 
-import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting} from '../templates.js';
+import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting, SmallList} from '../templates.js';
 import {Request, toast} from '../utils.js';
 
 export var Thread = React.createClass({
@@ -76,6 +76,7 @@ export var Thread = React.createClass({
                 footer = <button className="btn btn-primary" onClick={this.getNewPosts}>Load new!</button>;
             }
             return <section className="full_thread">
+                <SmallList lang={this.props.params.lang} />
                 <FirstPost data={this.state.first_post} />
                 {posts_arr}
                 {footer}

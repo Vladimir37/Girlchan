@@ -4,7 +4,7 @@ import {Router} from "react-router";
 import $ from 'jquery';
 import Moment from "moment";
 
-import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting} from '../templates.js';
+import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting, SmallList} from '../templates.js';
 import {Request, toast} from '../utils.js';
 
 var Thread = React.createClass({
@@ -103,7 +103,7 @@ export var Board = React.createClass({
         var req_data = {
             lang: this.props.params.lang,
             board: this.props.params.board,
-            threads: JSON.stringify(self.state.threads.slice(self.state.start, self.state.limit))
+            threads: JSON.stringify(self.state.threads.slice(self.state.start, (self.state.limit + self.state.start)))
         };
         Request('/api/short_threads', req_data, 'GET', self, function(threads) {
             self.setState({
@@ -132,9 +132,11 @@ export var Board = React.createClass({
                 return <Thread data={thread} param={self.props.params} />
             });
             return <article className="threads_list">
-                <Posting button="Create thread" addr="create_thread" thread="true" param={this.props.params}/>
+                <SmallList lang={this.props.params.lang} />
+                <Posting button="Create topic" addr="create_thread" thread="true" param={this.props.params}/>
                 {threads_arr}
                 <div className="clearfix"></div>
+                <button className="btn btn-primary" onClick={this.getContent}>Load more topics</button>
             </article>;
         }
     }

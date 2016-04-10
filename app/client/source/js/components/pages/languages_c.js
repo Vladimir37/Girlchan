@@ -9,7 +9,7 @@ export var Languages = React.createClass({
         return {
             loaded: false,
             error: false,
-            langs: []
+            langs: null
         }
     },
     getLanguages() {

@@ -37465,7 +37465,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.Posting = exports.Post = exports.FirstPost = exports.PleaseWait = exports.ServerError = exports.NotFound = undefined;
+	exports.SmallList = exports.Posting = exports.Post = exports.FirstPost = exports.PleaseWait = exports.ServerError = exports.NotFound = undefined;
 
 	var _react = __webpack_require__(17);
 
@@ -37679,6 +37679,57 @@
 	                )
 	            )
 	        );
+	    }
+	});
+
+	var SmallList = exports.SmallList = _react2.default.createClass({
+	    displayName: 'SmallList',
+	    getInitialState: function getInitialState() {
+	        return {
+	            loaded: false,
+	            boards: null
+	        };
+	    },
+	    getBoards: function getBoards() {
+	        var self = this;
+	        (0, _utils.Request)('/api/boards', {}, 'GET', self, function (boards) {
+	            self.setState({
+	                loaded: true,
+	                boards: boards
+	            });
+	        });
+	    },
+	    render: function render() {
+	        if (!this.state.loaded) {
+	            this.getBoards();
+	            return _react2.default.createElement(
+	                'ul',
+	                { className: 'breadcrumb' },
+	                _react2.default.createElement(
+	                    'li',
+	                    null,
+	                    'Loading...'
+	                )
+	            );
+	        } else {
+	            var lang = this.props.lang;
+	            var boards = this.state.boards.map(function (board) {
+	                return _react2.default.createElement(
+	                    'li',
+	                    null,
+	                    _react2.default.createElement(
+	                        'a',
+	                        { href: "/" + lang + "/" + board.addr },
+	                        board.names[lang]
+	                    )
+	                );
+	            });
+	            return _react2.default.createElement(
+	                'ul',
+	                { className: 'breadcrumb' },
+	                boards
+	            );
+	        }
 	    }
 	});
 
@@ -50872,7 +50923,6 @@
 	        dataType: 'json',
 	        error: _error(context),
 	        success: function success(data) {
-	            console.log(data);
 	            if (data.status == 0) {
 	                _success(data.body);
 	            } else {
@@ -50937,7 +50987,7 @@
 	        return {
 	            loaded: false,
 	            error: false,
-	            langs: []
+	            langs: null
 	        };
 	    },
 	    getLanguages: function getLanguages() {
@@ -51011,7 +51061,7 @@
 	        return {
 	            loaded: false,
 	            error: false,
-	            boards: []
+	            boards: null
 	        };
 	    },
 	    getBoards: function getBoards() {
@@ -51191,7 +51241,7 @@
 	            self.setState({
 	                loaded_threads: true,
 	                threads: threads
-	            }, function (err) {});
+	            });
 	        });
 	    },
 	    getContent: function getContent() {
@@ -51199,10 +51249,9 @@
 	        var req_data = {
 	            lang: this.props.params.lang,
 	            board: this.props.params.board,
-	            threads: JSON.stringify(self.state.threads.slice(self.state.start, self.state.limit))
+	            threads: JSON.stringify(self.state.threads.slice(self.state.start, self.state.limit + self.state.start))
 	        };
 	        (0, _utils.Request)('/api/short_threads', req_data, 'GET', self, function (threads) {
-	            console.log(threads);
 	            self.setState({
 	                loaded_content: true,
 	                content: self.state.content.concat(threads),
@@ -51228,9 +51277,15 @@
 	            return _react2.default.createElement(
 	                'article',
 	                { className: 'threads_list' },
+	                _react2.default.createElement(_templates.SmallList, { lang: this.props.params.lang }),
 	                _react2.default.createElement(_templates.Posting, { button: 'Create thread', addr: 'create_thread', thread: 'true', param: this.props.params }),
 	                threads_arr,
-	                _react2.default.createElement('div', { className: 'clearfix' })
+	                _react2.default.createElement('div', { className: 'clearfix' }),
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: 'btn btn-primary', onClick: this.getContent },
+	                    'Load more topics'
+	                )
 	            );
 	        }
 	    }
@@ -51345,6 +51400,7 @@
 	            return _react2.default.createElement(
 	                'section',
 	                { className: 'full_thread' },
+	                _react2.default.createElement(_templates.SmallList, { lang: this.props.params.lang }),
 	                _react2.default.createElement(_templates.FirstPost, { data: this.state.first_post }),
 	                posts_arr,
 	                footer,

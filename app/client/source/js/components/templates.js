@@ -125,3 +125,42 @@ export var Posting = React.createClass({
         </article>;
     }
 });
+
+export var SmallList = React.createClass({
+    getInitialState() {
+        return {
+            loaded: false,
+            boards: null
+        };
+    },
+    getBoards() {
+        var self = this;
+        Request('/api/boards', {}, 'GET', self, function(boards) {
+            self.setState({
+                loaded: true,
+                boards
+            });
+        });
+    },
+    render() {
+        if(!this.state.loaded) {
+            this.getBoards();
+            return <ul className="breadcrumb">
+                <li>Loading...</li>
+            </ul>;
+        }
+        else {
+            var lang = this.props.lang;
+            var boards = this.state.boards.map(function(board) {
+                return <li>
+                    <a href={"/" + lang + "/" + board.addr}>
+                        {board.names[lang]}
+                    </a>
+                </li>;
+            });
+            return <ul className="breadcrumb">
+                {boards}
+            </ul>;
+        }
+    }
+});

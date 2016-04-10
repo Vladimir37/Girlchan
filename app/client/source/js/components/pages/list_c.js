@@ -11,7 +11,7 @@ export var List = React.createClass({
         return {
             loaded: false,
             error: false,
-            boards: []
+            boards: null
         }
     },
     getBoards() {
