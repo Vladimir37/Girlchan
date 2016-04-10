@@ -4,8 +4,8 @@ import {Router} from "react-router";
 import $ from 'jquery';
 import Moment from "moment";
 
-import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting} from './templates.js';
-import {Request, toast} from './utils.js';
+import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting} from '../templates.js';
+import {Request, toast} from '../utils.js';
 
 var Thread = React.createClass({
     getInitialState() {
@@ -95,8 +95,6 @@ export var Board = React.createClass({
             self.setState({
                 loaded_threads: true,
                 threads
-            }, function(err) {
-
             });
         });
     },
@@ -108,7 +106,6 @@ export var Board = React.createClass({
             threads: JSON.stringify(self.state.threads.slice(self.state.start, self.state.limit))
         };
         Request('/api/short_threads', req_data, 'GET', self, function(threads) {
-            console.log(threads);
             self.setState({
                 loaded_content: true,
                 content: self.state.content.concat(threads),
@@ -119,7 +116,7 @@ export var Board = React.createClass({
     render() {
         Moment.locale(this.props.params.lang);
         if(this.state.error) {
-            return <ServerError />;
+            return <NotFound />;
         }
         else if(!this.state.loaded_threads) {
             this.getThreads();

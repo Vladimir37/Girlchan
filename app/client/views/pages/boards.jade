@@ -1,6 +1,0 @@
-extends ../basis/layout
-
-block content
-    - each board, addr in data[lang].boards
-        a(href='/' + lang + '/' + addr)
-            h2=board

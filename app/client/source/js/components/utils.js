@@ -29,7 +29,6 @@ export function Request(url, data, type, context, success, error) {
         dataType: 'json',
         error: error(context),
         success(data) {
-            console.log(data);
             if(data.status == 0) {
                 success(data.body);
             }

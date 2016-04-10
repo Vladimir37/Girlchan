@@ -4,8 +4,8 @@ import {Router} from "react-router";
 import $ from 'jquery';
 import Moment from "moment";
 
-import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting} from './templates.js';
-import {Request, toast} from './utils.js';
+import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting} from '../templates.js';
+import {Request, toast} from '../utils.js';
 
 export var Thread = React.createClass({
     mixins: [Router.State],
@@ -58,7 +58,7 @@ export var Thread = React.createClass({
     render() {
         Moment.locale(this.props.params.lang);
         if(this.state.error) {
-            return <ServerError />;
+            return <NotFound />;
         }
         else if(!this.state.loaded_thread) {
             this.getAllPosts();
