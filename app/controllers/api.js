@@ -153,13 +153,15 @@ class ApiController {
         var lang = req.body.lang;
         var board = req.body.board;
         var text = req.body.content;
+        var color = req.body.color || null;
         var time_now = new Date();
         models.Post.create({
             lang,
             board,
             answer: false,
             time: time_now,
-            text
+            text,
+            color
         }).then(function(new_thread) {
             stacks[lang][board].add_thread(new_thread._id);
             res.end(serialize(0, new_thread._id));
@@ -173,6 +175,7 @@ class ApiController {
         var board = req.body.board;
         var thread = req.body.thread;
         var text = req.body.content;
+        var color = req.body.color || null;
         var time_now = new Date();
         models.Post.create({
             lang,
@@ -180,7 +183,8 @@ class ApiController {
             answer: true,
             thread,
             time: time_now,
-            text
+            text,
+            color
         }).then(function() {
             stacks[lang][board].bump_thread(thread);
             res.end(serialize(0));

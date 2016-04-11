@@ -11,6 +11,9 @@
 .panel {
     clear: both;
 }
+.panel-body {
+    white-space: pre-line;
+}
 .posting_form {
     text-align: center;
 }
@@ -43,6 +46,16 @@
 }
 .post {
     margin-left: 50px;
+}
+.color_panel {
+    float: right;
+}
+.circle {
+    padding: 5px;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    margin: 0 auto;
 }
 .full_read_btn {
     float: right;

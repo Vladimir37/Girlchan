@@ -37561,6 +37561,10 @@
 	    },
 	    render: function render() {
 	        var read = '';
+	        var color_panel = '';
+	        if (this.props.data.color) {
+	            color_panel = _react2.default.createElement('article', { className: 'color_panel circle', style: { background: "#" + this.props.data.color } });
+	        }
 	        if (this.props.read) {
 	            read = _react2.default.createElement(
 	                'a',
@@ -37580,7 +37584,9 @@
 	                { className: 'panel-heading' },
 	                (0, _moment2.default)(this.props.data.time).format('LTS L'),
 	                ' ',
-	                read
+	                read,
+	                ' ',
+	                color_panel
 	            ),
 	            _react2.default.createElement(
 	                'article',
@@ -37597,13 +37603,19 @@
 	        return null;
 	    },
 	    render: function render() {
+	        var color_panel = '';
+	        if (this.props.data.color) {
+	            color_panel = _react2.default.createElement('article', { className: 'color_panel circle', style: { background: "#" + this.props.data.color } });
+	        }
 	        return _react2.default.createElement(
 	            'article',
 	            { className: 'panel panel-default post' },
 	            _react2.default.createElement(
 	                'article',
 	                { className: 'panel-heading' },
-	                (0, _moment2.default)(this.props.data.time).format('LTS L')
+	                (0, _moment2.default)(this.props.data.time).format('LTS L'),
+	                ' ',
+	                color_panel
 	            ),
 	            _react2.default.createElement(
 	                'article',
@@ -37618,7 +37630,8 @@
 	    displayName: 'Posting',
 	    getInitialState: function getInitialState() {
 	        return {
-	            textValue: ''
+	            textValue: '',
+	            color: null
 	        };
 	    },
 	    submitForm: function submitForm() {
@@ -37632,6 +37645,7 @@
 	            lang: this.props.param.lang,
 	            board: this.props.param.board,
 	            content: this.state.textValue,
+	            color: this.state.color,
 	            thread: this.props.param.thread
 	        };
 	        (0, _utils.Request)(url, req_data, 'POST', this, function (thread_addr) {
@@ -37648,14 +37662,31 @@
 	            (0, _utils.toast)('Server error!', true);
 	        });
 	    },
-	    handleChange: function handleChange(event) {
+	    changeText: function changeText(event) {
 	        this.setState({
 	            textValue: event.target.value
+	        });
+	    },
+	    changeColor: function changeColor(event) {
+	        var new_color = event.target.value;
+	        if (new_color == 'None') {
+	            new_color = null;
+	        }
+	        this.setState({
+	            color: new_color
 	        });
 	    },
 	    render: function render() {
 	        var className = this.props.small ? 'post_form' : 'thread_form';
 	        var target_id = 'target_' + (0, _randomToken2.default)(16);
+	        var color = _react2.default.createElement(
+	            'article',
+	            { className: 'color_posting' },
+	            'Colorless'
+	        );
+	        if (this.state.color) {
+	            color = _react2.default.createElement('article', { className: 'circle', style: { background: "#" + this.state.color } });
+	        }
 	        return _react2.default.createElement(
 	            'article',
 	            { className: "panel panel-info posting_form " + className },
@@ -37671,7 +37702,58 @@
 	            _react2.default.createElement(
 	                'article',
 	                { id: target_id, className: 'collapse panel-body' },
-	                _react2.default.createElement('textarea', { className: 'form-control', placeholder: 'Your post...', value: this.state.textValue, onChange: this.handleChange }),
+	                color,
+	                _react2.default.createElement('textarea', { className: 'form-control', placeholder: 'Your post...', value: this.state.textValue, onChange: this.changeText }),
+	                _react2.default.createElement(
+	                    'select',
+	                    { name: 'color', value: this.state.color, onChange: this.changeColor },
+	                    _react2.default.createElement(
+	                        'option',
+	                        null,
+	                        'None'
+	                    ),
+	                    _react2.default.createElement(
+	                        'option',
+	                        { value: '00C0FF' },
+	                        'Blue'
+	                    ),
+	                    _react2.default.createElement(
+	                        'option',
+	                        { value: 'FF6736' },
+	                        'Orange'
+	                    ),
+	                    _react2.default.createElement(
+	                        'option',
+	                        { value: 'FF0000' },
+	                        'Red'
+	                    ),
+	                    _react2.default.createElement(
+	                        'option',
+	                        { value: '6AFF36' },
+	                        'Green'
+	                    ),
+	                    _react2.default.createElement(
+	                        'option',
+	                        { value: 'CB36FF' },
+	                        'Violet'
+	                    ),
+	                    _react2.default.createElement(
+	                        'option',
+	                        { value: 'FFFC33' },
+	                        'Yellow'
+	                    ),
+	                    _react2.default.createElement(
+	                        'option',
+	                        { value: 'F757A9' },
+	                        'Pink'
+	                    ),
+	                    _react2.default.createElement(
+	                        'option',
+	                        { value: '9C57F7' },
+	                        'Purple'
+	                    )
+	                ),
+	                _react2.default.createElement('br', null),
 	                _react2.default.createElement(
 	                    'button',
 	                    { className: 'btn btn-primary btn-sm', onClick: this.submitForm },
@@ -51278,7 +51360,7 @@
 	                'article',
 	                { className: 'threads_list' },
 	                _react2.default.createElement(_templates.SmallList, { lang: this.props.params.lang }),
-	                _react2.default.createElement(_templates.Posting, { button: 'Create thread', addr: 'create_thread', thread: 'true', param: this.props.params }),
+	                _react2.default.createElement(_templates.Posting, { button: 'Create topic', addr: 'create_thread', thread: 'true', param: this.props.params }),
 	                threads_arr,
 	                _react2.default.createElement('div', { className: 'clearfix' }),
 	                _react2.default.createElement(

@@ -32,7 +32,8 @@ var postSchema = new mongoose.Schema({
     answer: Boolean,
     thread: String,
     time: Date,
-    text: String
+    text: String,
+    color: String
 });
 models.Post = mongoose.model('Post', postSchema);
 

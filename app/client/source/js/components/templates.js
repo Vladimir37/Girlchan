@@ -48,13 +48,17 @@ export var FirstPost = React.createClass({
     },
     render() {
         var read = '';
+        var color_panel = '';
+        if(this.props.data.color) {
+            color_panel = <article className="color_panel circle" style={{background: "#" + this.props.data.color}}></article>;
+        }
         if(this.props.read) {
             read = <a href={"/" + this.props.param.lang + "/" + this.props.param.board + "/" + this.props.data._id}>
                 <button className="btn btn-xs full_read_btn">Read</button>
             </a>
         }
         return <article className="panel panel-primary">
-            <article className="panel-heading">{Moment(this.props.data.time).format('LTS L')} {read}</article>
+            <article className="panel-heading">{Moment(this.props.data.time).format('LTS L')} {read} {color_panel}</article>
             <article className="panel-body">{this.props.data.text}</article>
         </article>;
     }
@@ -65,8 +69,12 @@ export var Post = React.createClass({
         return null;
     },
     render() {
+        var color_panel = '';
+        if(this.props.data.color) {
+            color_panel = <article className="color_panel circle" style={{background: "#" + this.props.data.color}}></article>;
+        }
         return <article className="panel panel-default post">
-            <article className="panel-heading">{Moment(this.props.data.time).format('LTS L')}</article>
+            <article className="panel-heading">{Moment(this.props.data.time).format('LTS L')} {color_panel}</article>
             <article className="panel-body">{this.props.data.text}</article>
         </article>;
     }
@@ -75,7 +83,8 @@ export var Post = React.createClass({
 export var Posting = React.createClass({
     getInitialState() {
         return {
-            textValue: ''
+            textValue: '',
+            color: null
         };
     },
     submitForm() {
@@ -89,6 +98,7 @@ export var Posting = React.createClass({
             lang: this.props.param.lang,
             board: this.props.param.board,
             content: this.state.textValue,
+            color: this.state.color,
             thread: this.props.param.thread
         };
         Request(url, req_data, 'POST', this, function(thread_addr) {
@@ -106,20 +116,46 @@ export var Posting = React.createClass({
             toast('Server error!', true);
         });
     },
-    handleChange(event) {
+    changeText(event) {
         this.setState({
             textValue: event.target.value
+        });
+    },
+    changeColor(event) {
+        var new_color = event.target.value;
+        if(new_color == 'None') {
+            new_color = null;
+        }
+        this.setState({
+            color: new_color
         });
     },
     render() {
         var className = this.props.small ? 'post_form' : 'thread_form';
         var target_id = 'target_' + Random(16);
+        var color = <article className="color_posting">Colorless</article>;
+        if(this.state.color) {
+            color = <article className="circle" style={{background: "#" + this.state.color}}></article>;
+        }
         return <article className={"panel panel-info posting_form " + className}>
             <article className="panel-heading" data-toggle="collapse" data-target={'#' + target_id}>
                 <h3 className="panel-title">{this.props.button}</h3>
             </article>
             <article id={target_id} className="collapse panel-body">
-                <textarea className="form-control" placeholder="Your post..." value={this.state.textValue} onChange={this.handleChange}></textarea>
+                {color}
+                <textarea className="form-control" placeholder="Your post..." value={this.state.textValue} onChange={this.changeText}></textarea>
+                <select name="color" value={this.state.color} onChange={this.changeColor}>
+                    <option>None</option>
+                    <option value="00C0FF">Blue</option>
+                    <option value="FF6736">Orange</option>
+                    <option value="FF0000">Red</option>
+                    <option value="6AFF36">Green</option>
+                    <option value="CB36FF">Violet</option>
+                    <option value="FFFC33">Yellow</option>
+                    <option value="F757A9">Pink</option>
+                    <option value="9C57F7">Purple</option>
+                </select>
+                <br/>
                 <button className="btn btn-primary btn-sm" onClick={this.submitForm}>Submit</button>
             </article>
         </article>;
