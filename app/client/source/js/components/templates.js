@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import {Router} from "react-router";
 import Random from "random-token";
 import Moment from "moment";
+import Cookies from "js-cookie";
 
 import {Request, toast} from './utils.js';
 
@@ -82,9 +83,10 @@ export var Post = React.createClass({
 
 export var Posting = React.createClass({
     getInitialState() {
+        var current_color = Cookies.get('gc_color');
         return {
             textValue: '',
-            color: null
+            color: current_color || null
         };
     },
     submitForm() {
@@ -101,6 +103,9 @@ export var Posting = React.createClass({
             color: this.state.color,
             thread: this.props.param.thread
         };
+        if(this.state.color) {
+            Cookies.set('gc_color', this.state.color, { expires: 7 });
+        }
         Request(url, req_data, 'POST', this, function(thread_addr) {
             if(self.props.thread) {
                 window.location.pathname = '/' + req_data.lang + '/' + req_data.board + '/' + thread_addr;
