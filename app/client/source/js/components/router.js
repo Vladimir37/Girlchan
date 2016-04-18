@@ -14,7 +14,6 @@ $(document).ready(function() {
         <Route path="/" component={Languages}></Route>
         <Route path="/:lang" component={List}></Route>
         <Route path="/:lang/:board" component={Board}></Route>
-        <Route path="/:lang/:board/:thread" component={Thread}></Route>
         <Route path="*" component={NotFound}></Route>
     </Router>
     ), document.getElementsByClassName('main_content')[0]);

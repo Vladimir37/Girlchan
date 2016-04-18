@@ -6,6 +6,7 @@ import Moment from "moment";
 import Cookies from "js-cookie";
 
 import {Request, toast} from './utils.js';
+import {store, loadAct, cleanAct} from './redux.js';
 
 export var NotFound = React.createClass({
     getInitialState() {
@@ -47,6 +48,9 @@ export var FirstPost = React.createClass({
     getInitialState() {
         return null;
     },
+    readFullThread() {
+        $('#modal-thread').modal('show');
+    },
     render() {
         var read = '';
         var color_panel = '';
@@ -54,9 +58,7 @@ export var FirstPost = React.createClass({
             color_panel = <article className="color_panel circle" style={{background: "#" + this.props.data.color}}></article>;
         }
         if(this.props.read) {
-            read = <a href={"/" + this.props.param.lang + "/" + this.props.param.board + "/" + this.props.data._id}>
-                <button className="btn btn-xs full_read_btn">Read</button>
-            </a>
+            read = <button className="btn btn-xs full_read_btn" onClick={this.readFullThread}>Read full thread</button>;
         }
         return <article className="panel panel-primary">
             <article className="panel-heading">{Moment(this.props.data.time).format('LTS L')} {read} {color_panel}</article>
@@ -149,17 +151,7 @@ export var Posting = React.createClass({
             <article id={target_id} className="collapse panel-body">
                 {color}
                 <textarea className="form-control" placeholder="Your post..." value={this.state.textValue} onChange={this.changeText}></textarea>
-                <select name="color" value={this.state.color} onChange={this.changeColor}>
-                    <option>None</option>
-                    <option value="00C0FF">Blue</option>
-                    <option value="FF6736">Orange</option>
-                    <option value="FF0000">Red</option>
-                    <option value="6AFF36">Green</option>
-                    <option value="CB36FF">Violet</option>
-                    <option value="FFFC33">Yellow</option>
-                    <option value="F757A9">Pink</option>
-                    <option value="9C57F7">Purple</option>
-                </select>
+                <input type="text" name="color" className="colorpick" value={this.state.color} onChange={this.changeColor} />
                 <br/>
                 <button className="btn btn-primary btn-sm" onClick={this.submitForm}>Submit</button>
             </article>
@@ -202,6 +194,109 @@ export var SmallList = React.createClass({
             return <ul className="breadcrumb">
                 {boards}
             </ul>;
+        }
+    }
+});
+
+export var ModalThread = React.createClass({
+    getInitialState() {
+        return {
+            loaded: false,
+            error: false,
+            thread: null
+        };
+    },
+    render() {
+        var data = {
+            lang: this.props.lang,
+            board: this.props.board,
+            thread: null
+        };
+        return <div className="modal fade" id="modal-thread" tabIndex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+            <div className="modal-dialog modal-lg">
+                <div className="modal-content">
+                    <Thread data={data} />
+                </div>
+            </div>
+        </div>;
+    }
+});
+
+export var Thread = React.createClass({
+    mixins: [Router.State],
+    getInitialState() {
+        return {
+            loaded_thread: false,
+            loading: false,
+            error: false,
+            first_post: null,
+            posts: [],
+            count: 0
+        }
+    },
+    getAllPosts() {
+        var self = this;
+        var req_data = {
+            lang: this.props.data.lang,
+            board: this.props.data.board,
+            thread: this.props.data.thread
+        };
+        Request('/api/full_thread', req_data, 'GET', self, function(thread) {
+            self.setState({
+                loaded_thread: true,
+                first_post: thread.op_post,
+                posts: thread.posts,
+                count: thread.count
+            });
+        });
+    },
+    getNewPosts() {
+        var self = this;
+        self.setState({
+            loading: true
+        });
+        var req_data = {
+            lang: this.props.data.lang,
+            board: this.props.data.board,
+            thread: this.props.data.thread,
+            count: this.state.count
+        };
+        Request('/api/new_posts', req_data, 'GET', self, function(new_posts) {
+            var all_posts = self.state.posts.concat(new_posts);
+            self.setState({
+                loading: false,
+                posts: all_posts,
+                count: all_posts.length
+            });
+        });
+    },
+    render() {
+        Moment.locale(this.props.data.lang);
+        if(this.state.error) {
+            return <NotFound />;
+        }
+        else if(!this.state.loaded_thread) {
+            this.getAllPosts();
+            return <PleaseWait />;
+        }
+        else {
+            var posts_arr = this.state.posts.map(function(post) {
+                return <Post data={post} />;
+            });
+            var footer;
+            if(this.state.loading) {
+                footer = <img src="/src/images/main/load.gif" alt="loading_footer" />;
+            }
+            else {
+                footer = <button className="btn btn-primary" onClick={this.getNewPosts}>Load new!</button>;
+            }
+            return <section className="full_thread">
+                <SmallList lang={this.props.data.lang} />
+                <FirstPost data={this.state.first_post} />
+                {posts_arr}
+                {footer}
+                <Posting button="Create post" addr="create_post" refresh={this.getNewPosts} param={this.props.data} />
+            </section>;
         }
     }
 });

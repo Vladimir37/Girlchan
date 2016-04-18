@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Router} from "react-router";
+import {Router} from 'react-router';
 import $ from 'jquery';
 import Moment from "moment";
 
-import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting, SmallList} from '../templates.js';
+import {Post, FirstPost, NotFound, ServerError, PleaseWait, Posting, SmallList, ModalThread} from '../templates.js';
 import {Request, toast} from '../utils.js';
+import {store, loadAct, cleanAct} from '../redux.js';
 
 var Thread = React.createClass({
     getInitialState() {
@@ -132,6 +133,7 @@ export var Board = React.createClass({
                 return <Thread data={thread} param={self.props.params} />
             });
             return <article className="threads_list">
+                <ModalThread />
                 <SmallList lang={this.props.params.lang} />
                 <Posting button="Create topic" addr="create_thread" thread="true" param={this.props.params}/>
                 {threads_arr}

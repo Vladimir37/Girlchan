@@ -27,7 +27,9 @@
     "random-token": "0.0.8",
     "react": "0.14.6",
     "react-dom": "0.14.6",
+    "react-redux": "^4.4.5",
     "react-router": "2.0.0",
+    "redux": "^3.4.0",
     "serve-favicon": "*",
     "toastr": "^2.1.2",
     "webpack": "*"
