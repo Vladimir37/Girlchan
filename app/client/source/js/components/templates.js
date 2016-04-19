@@ -49,6 +49,7 @@ export var FirstPost = React.createClass({
         return null;
     },
     readFullThread() {
+        store.dispatch(loadAct(this.props.data._id));
         $('#modal-thread').modal('show');
     },
     render() {
@@ -201,24 +202,40 @@ export var SmallList = React.createClass({
 export var ModalThread = React.createClass({
     getInitialState() {
         return {
-            loaded: false,
-            error: false,
-            thread: null
+            thread: store.getState().thread,
+            load_num: 0
         };
+    },
+    selectThread() {
+        this.setState({
+            thread: store.getState().thread,
+            load_num: this.state.load_num + 1
+        });
     },
     render() {
         var data = {
             lang: this.props.lang,
             board: this.props.board,
-            thread: null
+            thread: this.state.thread
         };
-        return <div className="modal fade" id="modal-thread" tabIndex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-            <div className="modal-dialog modal-lg">
-                <div className="modal-content">
-                    <Thread data={data} />
-                </div>
-            </div>
-        </div>;
+        var self = this;
+        store.subscribe(function() {
+            console.log(store.getState().thread);
+            self.selectThread();
+        });
+        return <article className="modal fade" id="modal-thread" tabIndex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+            <article className="modal-dialog modal-lg">
+                <article className="modal-content">
+                    <article className="modal-header">
+                        <h4 className="modal-title">Заголовок</h4>
+                    </article>
+                    <article className="modal-body">
+                        <Thread data={data} num={this.state.load_num} />
+                    </article>
+                    <article className="modal-footer"></article>
+                </article>
+            </article>
+        </article>;
     }
 });
 
@@ -226,6 +243,7 @@ export var Thread = React.createClass({
     mixins: [Router.State],
     getInitialState() {
         return {
+            load_num: 0,
             loaded_thread: false,
             loading: false,
             error: false,
@@ -272,6 +290,17 @@ export var Thread = React.createClass({
     },
     render() {
         Moment.locale(this.props.data.lang);
+        if(this.props.num != this.state.load_num) {
+            this.setState({
+                load_num: this.props.num,
+                loaded_thread: false,
+                loading: false,
+                error: false,
+                first_post: null,
+                posts: [],
+                count: 0
+            })
+        }
         if(this.state.error) {
             return <NotFound />;
         }
@@ -291,7 +320,6 @@ export var Thread = React.createClass({
                 footer = <button className="btn btn-primary" onClick={this.getNewPosts}>Load new!</button>;
             }
             return <section className="full_thread">
-                <SmallList lang={this.props.data.lang} />
                 <FirstPost data={this.state.first_post} />
                 {posts_arr}
                 {footer}

@@ -10,6 +10,8 @@ function error_handling(context) {
 }
 
 export function Request(url, data, type, context, success, error) {
+    console.log(url);
+    console.log(data);
     var emptyFunction = function(){};
     success = success || emptyFunction;
     if(error) {

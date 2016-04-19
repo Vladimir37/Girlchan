@@ -37450,7 +37450,6 @@
 	        _react2.default.createElement(_reactRouter.Route, { path: "/", component: _languages_c.Languages }),
 	        _react2.default.createElement(_reactRouter.Route, { path: "/:lang", component: _list_c.List }),
 	        _react2.default.createElement(_reactRouter.Route, { path: "/:lang/:board", component: _board_c.Board }),
-	        _react2.default.createElement(_reactRouter.Route, { path: "/:lang/:board/:thread", component: _thread_c.Thread }),
 	        _react2.default.createElement(_reactRouter.Route, { path: "*", component: _templates.NotFound })
 	    ), document.getElementsByClassName('main_content')[0]);
 	});
@@ -37465,7 +37464,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.ModalThread = exports.SmallList = exports.Posting = exports.Post = exports.FirstPost = exports.PleaseWait = exports.ServerError = exports.NotFound = undefined;
+	exports.Thread = exports.ModalThread = exports.SmallList = exports.Posting = exports.Post = exports.FirstPost = exports.PleaseWait = exports.ServerError = exports.NotFound = undefined;
 
 	var _react = __webpack_require__(17);
 
@@ -37566,6 +37565,7 @@
 	        return null;
 	    },
 	    readFullThread: function readFullThread() {
+	        _redux.store.dispatch((0, _redux.loadAct)(this.props.data._id));
 	        $('#modal-thread').modal('show');
 	    },
 	    render: function render() {
@@ -37780,25 +37780,149 @@
 	    displayName: 'ModalThread',
 	    getInitialState: function getInitialState() {
 	        return {
-	            loaded: false,
-	            error: false,
-	            thread: null
+	            thread: _redux.store.getState().thread,
+	            load_num: 0
 	        };
 	    },
+	    selectThread: function selectThread() {
+	        this.setState({
+	            thread: _redux.store.getState().thread,
+	            load_num: this.state.load_num + 1
+	        });
+	    },
 	    render: function render() {
+	        var data = {
+	            lang: this.props.lang,
+	            board: this.props.board,
+	            thread: this.state.thread
+	        };
+	        var self = this;
+	        _redux.store.subscribe(function () {
+	            console.log(_redux.store.getState().thread);
+	            self.selectThread();
+	        });
 	        return _react2.default.createElement(
-	            'div',
+	            'article',
 	            { className: 'modal fade', id: 'modal-thread', tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'myLargeModalLabel', 'aria-hidden': 'true' },
 	            _react2.default.createElement(
-	                'div',
+	                'article',
 	                { className: 'modal-dialog modal-lg' },
 	                _react2.default.createElement(
-	                    'div',
+	                    'article',
 	                    { className: 'modal-content' },
-	                    'Text'
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: 'modal-header' },
+	                        _react2.default.createElement(
+	                            'h4',
+	                            { className: 'modal-title' },
+	                            'Заголовок'
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: 'modal-body' },
+	                        _react2.default.createElement(Thread, { data: data, num: this.state.load_num })
+	                    ),
+	                    _react2.default.createElement('article', { className: 'modal-footer' })
 	                )
 	            )
 	        );
+	    }
+	});
+
+	var Thread = exports.Thread = _react2.default.createClass({
+	    displayName: 'Thread',
+
+	    mixins: [_reactRouter.Router.State],
+	    getInitialState: function getInitialState() {
+	        return {
+	            load_num: 0,
+	            loaded_thread: false,
+	            loading: false,
+	            error: false,
+	            first_post: null,
+	            posts: [],
+	            count: 0
+	        };
+	    },
+	    getAllPosts: function getAllPosts() {
+	        var self = this;
+	        var req_data = {
+	            lang: this.props.data.lang,
+	            board: this.props.data.board,
+	            thread: this.props.data.thread
+	        };
+	        (0, _utils.Request)('/api/full_thread', req_data, 'GET', self, function (thread) {
+	            self.setState({
+	                loaded_thread: true,
+	                first_post: thread.op_post,
+	                posts: thread.posts,
+	                count: thread.count
+	            });
+	        });
+	    },
+	    getNewPosts: function getNewPosts() {
+	        var self = this;
+	        self.setState({
+	            loading: true
+	        });
+	        var req_data = {
+	            lang: this.props.data.lang,
+	            board: this.props.data.board,
+	            thread: this.props.data.thread,
+	            count: this.state.count
+	        };
+	        (0, _utils.Request)('/api/new_posts', req_data, 'GET', self, function (new_posts) {
+	            var all_posts = self.state.posts.concat(new_posts);
+	            self.setState({
+	                loading: false,
+	                posts: all_posts,
+	                count: all_posts.length
+	            });
+	        });
+	    },
+	    render: function render() {
+	        _moment2.default.locale(this.props.data.lang);
+	        if (this.props.num != this.state.load_num) {
+	            this.setState({
+	                load_num: this.props.num,
+	                loaded_thread: false,
+	                loading: false,
+	                error: false,
+	                first_post: null,
+	                posts: [],
+	                count: 0
+	            });
+	        }
+	        if (this.state.error) {
+	            return _react2.default.createElement(NotFound, null);
+	        } else if (!this.state.loaded_thread) {
+	            this.getAllPosts();
+	            return _react2.default.createElement(PleaseWait, null);
+	        } else {
+	            var posts_arr = this.state.posts.map(function (post) {
+	                return _react2.default.createElement(Post, { data: post });
+	            });
+	            var footer;
+	            if (this.state.loading) {
+	                footer = _react2.default.createElement('img', { src: '/src/images/main/load.gif', alt: 'loading_footer' });
+	            } else {
+	                footer = _react2.default.createElement(
+	                    'button',
+	                    { className: 'btn btn-primary', onClick: this.getNewPosts },
+	                    'Load new!'
+	                );
+	            }
+	            return _react2.default.createElement(
+	                'section',
+	                { className: 'full_thread' },
+	                _react2.default.createElement(FirstPost, { data: this.state.first_post }),
+	                posts_arr,
+	                footer,
+	                _react2.default.createElement(Posting, { button: 'Create post', addr: 'create_post', refresh: this.getNewPosts, param: this.props.data })
+	            );
+	        }
 	    }
 	});
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
@@ -51126,6 +51250,8 @@
 	}
 
 	function Request(url, data, type, context, _success, _error) {
+	    console.log(url);
+	    console.log(data);
 	    var emptyFunction = function emptyFunction() {};
 	    _success = _success || emptyFunction;
 	    if (_error) {
@@ -51187,32 +51313,23 @@
 	    value: true
 	});
 	exports.store = undefined;
+	exports.loadAct = loadAct;
 
 	var _redux = __webpack_require__(338);
 
 	var _utils = __webpack_require__(336);
 
 	var initialState = {
-	    loaded: false,
-	    error: false,
-	    thread: null,
-	    content: null
+	    thread: null
 	};
 
 	function modalReducer(state, action) {
 	    state = state || initialState;
 	    switch (action.type) {
 	        case "LOAD":
-	            break;
-	        case "READY":
-	            return Object.assign(state, {
-	                loaded: true
-	            });
-	            break;
-	        case "ERROR":
-	            return Object.assign(state, {
-	                error: true
-	            });
+	            return {
+	                thread: action.thread
+	            };
 	            break;
 	        case "CLEAR":
 	            return initialState;
@@ -51227,31 +51344,10 @@
 
 	var store = exports.store = (0, _redux.createStore)(modalReducer, initialState);
 
-	function loadAct(thread, lang, board) {
-	    var req_data = {
-	        lang: lang,
-	        board: board,
-	        thread: thread
-	    };
-	    (0, _utils.Request)('/api/full_thread', req_data, 'GET', this, function () {
-	        store.dispatch(readyAct());
-	    }, function (err) {
-	        console.log(err);
-	        store.dispatch(errorArt());
-	    });
+	function loadAct(thread) {
 	    return {
 	        type: "LOAD",
 	        thread: thread
-	    };
-	}
-	function readyAct() {
-	    return {
-	        type: "READY"
-	    };
-	}
-	function errorArt() {
-	    return {
-	        type: "ERROR"
 	    };
 	}
 	function clearAct() {
@@ -52333,7 +52429,7 @@
 	            return _react2.default.createElement(
 	                'article',
 	                { className: 'threads_list' },
-	                _react2.default.createElement(_templates.ModalThread, null),
+	                _react2.default.createElement(_templates.ModalThread, { lang: this.props.params.lang, board: this.props.params.board }),
 	                _react2.default.createElement(_templates.SmallList, { lang: this.props.params.lang }),
 	                _react2.default.createElement(_templates.Posting, { button: 'Create topic', addr: 'create_thread', thread: 'true', param: this.props.params }),
 	                threads_arr,
@@ -52353,11 +52449,6 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.Thread = undefined;
 
 	var _react = __webpack_require__(17);
 
@@ -52382,90 +52473,6 @@
 	var _utils = __webpack_require__(336);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var Thread = exports.Thread = _react2.default.createClass({
-	    displayName: 'Thread',
-
-	    mixins: [_reactRouter.Router.State],
-	    getInitialState: function getInitialState() {
-	        return {
-	            loaded_thread: false,
-	            loading: false,
-	            error: false,
-	            first_post: null,
-	            posts: [],
-	            count: 0
-	        };
-	    },
-	    getAllPosts: function getAllPosts() {
-	        var self = this;
-	        var req_data = {
-	            lang: this.props.params.lang,
-	            board: this.props.params.board,
-	            thread: this.props.params.thread
-	        };
-	        (0, _utils.Request)('/api/full_thread', req_data, 'GET', self, function (thread) {
-	            self.setState({
-	                loaded_thread: true,
-	                first_post: thread.op_post,
-	                posts: thread.posts,
-	                count: thread.count
-	            });
-	        });
-	    },
-	    getNewPosts: function getNewPosts() {
-	        var self = this;
-	        self.setState({
-	            loading: true
-	        });
-	        var req_data = {
-	            lang: this.props.params.lang,
-	            board: this.props.params.board,
-	            thread: this.props.params.thread,
-	            count: this.state.count
-	        };
-	        (0, _utils.Request)('/api/new_posts', req_data, 'GET', self, function (new_posts) {
-	            var all_posts = self.state.posts.concat(new_posts);
-	            self.setState({
-	                loading: false,
-	                posts: all_posts,
-	                count: all_posts.length
-	            });
-	        });
-	    },
-	    render: function render() {
-	        _moment2.default.locale(this.props.params.lang);
-	        if (this.state.error) {
-	            return _react2.default.createElement(_templates.NotFound, null);
-	        } else if (!this.state.loaded_thread) {
-	            this.getAllPosts();
-	            return _react2.default.createElement(_templates.PleaseWait, null);
-	        } else {
-	            var posts_arr = this.state.posts.map(function (post) {
-	                return _react2.default.createElement(_templates.Post, { data: post });
-	            });
-	            var footer;
-	            if (this.state.loading) {
-	                footer = _react2.default.createElement('img', { src: '/src/images/main/load.gif', alt: 'loading_footer' });
-	            } else {
-	                footer = _react2.default.createElement(
-	                    'button',
-	                    { className: 'btn btn-primary', onClick: this.getNewPosts },
-	                    'Load new!'
-	                );
-	            }
-	            return _react2.default.createElement(
-	                'section',
-	                { className: 'full_thread' },
-	                _react2.default.createElement(_templates.SmallList, { lang: this.props.params.lang }),
-	                _react2.default.createElement(_templates.FirstPost, { data: this.state.first_post }),
-	                posts_arr,
-	                footer,
-	                _react2.default.createElement(_templates.Posting, { button: 'Create post', addr: 'create_post', refresh: this.getNewPosts, param: this.props.params })
-	            );
-	        }
-	    }
-	});
 
 /***/ }
 /******/ ]);
