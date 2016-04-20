@@ -37587,17 +37587,18 @@
 	            _react2.default.createElement(
 	                'article',
 	                { className: 'panel-heading' },
+	                _react2.default.createElement(
+	                    'h4',
+	                    { className: 'modal-title' },
+	                    this.props.data.title
+	                ),
 	                (0, _moment2.default)(this.props.data.time).format('LTS L'),
 	                ' ',
 	                read,
 	                ' ',
 	                color_panel
 	            ),
-	            _react2.default.createElement(
-	                'article',
-	                { className: 'panel-body' },
-	                this.props.data.text
-	            )
+	            _react2.default.createElement('article', { className: 'panel-body', dangerouslySetInnerHTML: (0, _utils.markdown)(this.props.data.text) })
 	        );
 	    }
 	});
@@ -37622,11 +37623,7 @@
 	                ' ',
 	                color_panel
 	            ),
-	            _react2.default.createElement(
-	                'article',
-	                { className: 'panel-body' },
-	                this.props.data.text
-	            )
+	            _react2.default.createElement('article', { className: 'panel-body', dangerouslySetInnerHTML: (0, _utils.markdown)(this.props.data.text) })
 	        );
 	    }
 	});
@@ -37636,6 +37633,7 @@
 	    getInitialState: function getInitialState() {
 	        var current_color = _jsCookie2.default.get('gc_color');
 	        return {
+	            titleValue: '',
 	            textValue: '',
 	            color: current_color || null
 	        };
@@ -37650,6 +37648,7 @@
 	        var req_data = {
 	            lang: this.props.param.lang,
 	            board: this.props.param.board,
+	            title: this.state.titleValue,
 	            content: this.state.textValue,
 	            color: this.state.color,
 	            thread: this.props.param.thread
@@ -37659,7 +37658,7 @@
 	        }
 	        (0, _utils.Request)(url, req_data, 'POST', this, function (thread_addr) {
 	            if (self.props.thread) {
-	                window.location.pathname = '/' + req_data.lang + '/' + req_data.board + '/' + thread_addr;
+	                window.location.pathname = '/' + req_data.lang + '/' + req_data.board;
 	            } else {
 	                (0, _utils.toast)('Post successfuly created!');
 	                self.setState({
@@ -37669,6 +37668,11 @@
 	            }
 	        }, function () {
 	            (0, _utils.toast)('Server error!', true);
+	        });
+	    },
+	    changeTitle: function changeTitle(event) {
+	        this.setState({
+	            titleValue: event.target.value
 	        });
 	    },
 	    changeText: function changeText(event) {
@@ -37696,6 +37700,10 @@
 	        if (this.state.color) {
 	            color = _react2.default.createElement('article', { className: 'circle', style: { background: "#" + this.state.color } });
 	        }
+	        var title = '';
+	        if (this.props.thread) {
+	            title = _react2.default.createElement('input', { type: 'text', className: 'form-control posting_title', placeholder: 'Title', value: this.state.titleValue, onChange: this.changeTitle });
+	        }
 	        return _react2.default.createElement(
 	            'article',
 	            { className: "panel panel-info posting_form " + className },
@@ -37712,6 +37720,7 @@
 	                'article',
 	                { id: target_id, className: 'collapse panel-body' },
 	                color,
+	                title,
 	                _react2.default.createElement('textarea', { className: 'form-control', placeholder: 'Your post...', value: this.state.textValue, onChange: this.changeText }),
 	                _react2.default.createElement('input', { type: 'text', name: 'color', className: 'colorpick', value: this.state.color, onChange: this.changeColor }),
 	                _react2.default.createElement('br', null),
@@ -51233,6 +51242,7 @@
 	});
 	exports.Request = undefined;
 	exports.toast = toast;
+	exports.markdown = markdown;
 
 	var _toastr = __webpack_require__(2);
 
@@ -51250,8 +51260,6 @@
 	}
 
 	function Request(url, data, type, context, _success, _error) {
-	    console.log(url);
-	    console.log(data);
 	    var emptyFunction = function emptyFunction() {};
 	    _success = _success || emptyFunction;
 	    if (_error) {
@@ -51300,6 +51308,15 @@
 	    };
 	    var type = is_bad ? "error" : "success";
 	    _toastr2.default[type](text);
+	}
+
+	function markdown(text) {
+	    var result = text.replace(/\*\*([\s\S]+?)\*\*/gm, '<b>$1</b>');
+	    result = result.replace(/\*([\s\S]+?)\*/gm, '<i>$1</i>');
+	    result = result.replace(/__([\s\S]+?)__/g, '<span class="crossed">$1</span>');
+	    result = result.replace(/%%([\s\S]+?)%%/g, '<span class="spoiler">$1</span>');
+	    result = result.replace(/(^|\n)(>.+?)(\n|$)/gm, '$1<article class="quote">$2</article>');
+	    return { __html: result };
 	}
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 

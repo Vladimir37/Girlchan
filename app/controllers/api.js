@@ -153,6 +153,7 @@ class ApiController {
         var lang = req.body.lang;
         var board = req.body.board;
         var text = req.body.content;
+        var title = req.body.title || null;
         var color = req.body.color || null;
         var time_now = new Date();
         models.Post.create({
@@ -160,6 +161,7 @@ class ApiController {
             board,
             answer: false,
             time: time_now,
+            title,
             text,
             color
         }).then(function(new_thread) {

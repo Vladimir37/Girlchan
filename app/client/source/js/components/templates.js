@@ -5,7 +5,7 @@ import Random from "random-token";
 import Moment from "moment";
 import Cookies from "js-cookie";
 
-import {Request, toast} from './utils.js';
+import {Request, toast, markdown} from './utils.js';
 import {store, loadAct, cleanAct} from './redux.js';
 
 export var NotFound = React.createClass({
@@ -62,8 +62,11 @@ export var FirstPost = React.createClass({
             read = <button className="btn btn-xs full_read_btn" onClick={this.readFullThread}>Read full thread</button>;
         }
         return <article className="panel panel-primary">
-            <article className="panel-heading">{Moment(this.props.data.time).format('LTS L')} {read} {color_panel}</article>
-            <article className="panel-body">{this.props.data.text}</article>
+            <article className="panel-heading">
+                <h4 className="modal-title">{this.props.data.title}</h4>
+                {Moment(this.props.data.time).format('LTS L')} {read} {color_panel}
+            </article>
+            <article className="panel-body" dangerouslySetInnerHTML={markdown(this.props.data.text)} />
         </article>;
     }
 });
@@ -79,7 +82,7 @@ export var Post = React.createClass({
         }
         return <article className="panel panel-default post">
             <article className="panel-heading">{Moment(this.props.data.time).format('LTS L')} {color_panel}</article>
-            <article className="panel-body">{this.props.data.text}</article>
+            <article className="panel-body" dangerouslySetInnerHTML={markdown(this.props.data.text)} />
         </article>;
     }
 });
@@ -88,6 +91,7 @@ export var Posting = React.createClass({
     getInitialState() {
         var current_color = Cookies.get('gc_color');
         return {
+            titleValue: '',
             textValue: '',
             color: current_color || null
         };
@@ -102,6 +106,7 @@ export var Posting = React.createClass({
         var req_data = {
             lang: this.props.param.lang,
             board: this.props.param.board,
+            title: this.state.titleValue,
             content: this.state.textValue,
             color: this.state.color,
             thread: this.props.param.thread
@@ -111,7 +116,7 @@ export var Posting = React.createClass({
         }
         Request(url, req_data, 'POST', this, function(thread_addr) {
             if(self.props.thread) {
-                window.location.pathname = '/' + req_data.lang + '/' + req_data.board + '/' + thread_addr;
+                window.location.pathname = '/' + req_data.lang + '/' + req_data.board;
             }
             else {
                 toast('Post successfuly created!');
@@ -122,6 +127,11 @@ export var Posting = React.createClass({
             }
         }, function() {
             toast('Server error!', true);
+        });
+    },
+    changeTitle(event) {
+        this.setState({
+            titleValue: event.target.value
         });
     },
     changeText(event) {
@@ -145,12 +155,17 @@ export var Posting = React.createClass({
         if(this.state.color) {
             color = <article className="circle" style={{background: "#" + this.state.color}}></article>;
         }
+        var title = '';
+        if(this.props.thread) {
+            title = <input type="text" className="form-control posting_title" placeholder="Title" value={this.state.titleValue} onChange={this.changeTitle} />;
+        }
         return <article className={"panel panel-info posting_form " + className}>
             <article className="panel-heading" data-toggle="collapse" data-target={'#' + target_id}>
                 <h3 className="panel-title">{this.props.button}</h3>
             </article>
             <article id={target_id} className="collapse panel-body">
                 {color}
+                {title}
                 <textarea className="form-control" placeholder="Your post..." value={this.state.textValue} onChange={this.changeText}></textarea>
                 <input type="text" name="color" className="colorpick" value={this.state.color} onChange={this.changeColor} />
                 <br/>

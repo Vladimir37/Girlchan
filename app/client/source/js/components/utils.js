@@ -10,8 +10,6 @@ function error_handling(context) {
 }
 
 export function Request(url, data, type, context, success, error) {
-    console.log(url);
-    console.log(data);
     var emptyFunction = function(){};
     success = success || emptyFunction;
     if(error) {
@@ -61,4 +59,13 @@ export function toast(text, is_bad) {
     };
     var type = is_bad ? "error" : "success";
     toastr[type](text);
+}
+
+export function markdown(text) {
+    var result = text.replace(/\*\*([\s\S]+?)\*\*/gm, '<b>$1</b>');
+    result = result.replace(/\*([\s\S]+?)\*/gm, '<i>$1</i>');
+    result = result.replace(/__([\s\S]+?)__/g, '<span class="crossed">$1</span>');
+    result = result.replace(/%%([\s\S]+?)%%/g, '<span class="spoiler">$1</span>');
+    result = result.replace(/(^|\n)(>.+?)(\n|$)/gm, '$1<article class="quote">$2</article>');
+    return {__html: result};
 }
