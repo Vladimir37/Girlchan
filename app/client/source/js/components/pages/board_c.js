@@ -86,6 +86,13 @@ export var Board = React.createClass({
             start: 0
         };
     },
+    componentDidUpdate() {
+        if(this.state.loaded_content && window.location.hash) {
+            store.dispatch(loadAct(window.location.hash.slice(1)));
+            console.log(window.location.hash.slice(1));
+            $('#modal-thread').modal('show');
+        }
+    },
     getThreads() {
         var self = this;
         var req_data = {

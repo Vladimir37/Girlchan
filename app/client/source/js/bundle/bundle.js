@@ -37566,6 +37566,7 @@
 	    },
 	    readFullThread: function readFullThread() {
 	        _redux.store.dispatch((0, _redux.loadAct)(this.props.data._id));
+	        window.location.hash = this.props.data._id;
 	        $('#modal-thread').modal('show');
 	    },
 	    render: function render() {
@@ -37807,7 +37808,6 @@
 	        };
 	        var self = this;
 	        _redux.store.subscribe(function () {
-	            console.log(_redux.store.getState().thread);
 	            self.selectThread();
 	        });
 	        return _react2.default.createElement(
@@ -37864,6 +37864,7 @@
 	        };
 	        (0, _utils.Request)('/api/full_thread', req_data, 'GET', self, function (thread) {
 	            self.setState({
+	                error: false,
 	                loaded_thread: true,
 	                first_post: thread.op_post,
 	                posts: thread.posts,
@@ -52399,6 +52400,13 @@
 	            limit: 10,
 	            start: 0
 	        };
+	    },
+	    componentDidUpdate: function componentDidUpdate() {
+	        if (this.state.loaded_content && window.location.hash) {
+	            _redux.store.dispatch((0, _redux.loadAct)(window.location.hash.slice(1)));
+	            console.log(window.location.hash.slice(1));
+	            (0, _jquery2.default)('#modal-thread').modal('show');
+	        }
 	    },
 	    getThreads: function getThreads() {
 	        var self = this;

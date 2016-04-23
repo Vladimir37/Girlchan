@@ -50,6 +50,7 @@ export var FirstPost = React.createClass({
     },
     readFullThread() {
         store.dispatch(loadAct(this.props.data._id));
+        window.location.hash = this.props.data._id;
         $('#modal-thread').modal('show');
     },
     render() {
@@ -235,7 +236,6 @@ export var ModalThread = React.createClass({
         };
         var self = this;
         store.subscribe(function() {
-            console.log(store.getState().thread);
             self.selectThread();
         });
         return <article className="modal fade" id="modal-thread" tabIndex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
@@ -276,6 +276,7 @@ export var Thread = React.createClass({
         };
         Request('/api/full_thread', req_data, 'GET', self, function(thread) {
             self.setState({
+                error: false,
                 loaded_thread: true,
                 first_post: thread.op_post,
                 posts: thread.posts,
