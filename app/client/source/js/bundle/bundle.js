@@ -37441,6 +37441,8 @@
 
 	var _thread_c = __webpack_require__(352);
 
+	var _login_c = __webpack_require__(353);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	$(document).ready(function () {
@@ -37448,6 +37450,7 @@
 	        _reactRouter.Router,
 	        { history: _reactRouter.browserHistory },
 	        _react2.default.createElement(_reactRouter.Route, { path: "/", component: _languages_c.Languages }),
+	        _react2.default.createElement(_reactRouter.Route, { path: "/mod", component: _login_c.Login }),
 	        _react2.default.createElement(_reactRouter.Route, { path: "/:lang", component: _list_c.List }),
 	        _react2.default.createElement(_reactRouter.Route, { path: "/:lang/:board", component: _board_c.Board }),
 	        _react2.default.createElement(_reactRouter.Route, { path: "*", component: _templates.NotFound })
@@ -51260,16 +51263,16 @@
 	    };
 	}
 
-	function Request(url, data, type, context, _success, _error) {
+	function Request(url, data, type, context, _success, error) {
 	    var emptyFunction = function emptyFunction() {};
 	    _success = _success || emptyFunction;
-	    if (_error) {
-	        _error = function error(err) {
-	            console.log(err);
-	            return _error;
+	    var error_func;
+	    if (error) {
+	        error_func = function error_func() {
+	            return error;
 	        };
 	    } else {
-	        _error = error_handling;
+	        error_func = error_handling;
 	    }
 	    data = data || {};
 	    $.ajax({
@@ -51277,12 +51280,12 @@
 	        type: type,
 	        data: data,
 	        dataType: 'json',
-	        error: _error(context),
+	        error: error_func(context),
 	        success: function success(data) {
 	            if (data.status == 0) {
 	                _success(data.body);
 	            } else {
-	                _error(context)(data.status);
+	                error_func(context)(data.status);
 	            }
 	        }
 	    });
@@ -52498,6 +52501,82 @@
 	var _utils = __webpack_require__(336);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ },
+/* 353 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.Login = undefined;
+
+	var _react = __webpack_require__(17);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(174);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _templates = __webpack_require__(233);
+
+	var _utils = __webpack_require__(336);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Login = exports.Login = _react2.default.createClass({
+	    displayName: 'Login',
+	    getInitialState: function getInitialState() {
+	        return {
+	            logged: false,
+	            username: '',
+	            password: ''
+	        };
+	    },
+	    changeLogin: function changeLogin(event) {
+	        this.setState({
+	            username: event.target.value
+	        });
+	    },
+	    changePass: function changePass(event) {
+	        this.setState({
+	            password: event.target.value
+	        });
+	    },
+	    submit: function submit() {
+	        if (!this.state.username || !this.state.password) {
+	            (0, _utils.toast)('Required fields are empty!', true);
+	        } else {
+	            var self = this;
+	            (0, _utils.Request)('/api/mod', this.state, 'POST', self, function (data) {
+	                window.location.pathname = '/';
+	            }, function () {
+	                (0, _utils.toast)('Incorrect login or password!', true);
+	                self.setState({
+	                    password: ''
+	                });
+	            });
+	        }
+	    },
+	    render: function render() {
+	        return _react2.default.createElement(
+	            'section',
+	            { className: 'login' },
+	            _react2.default.createElement('input', { type: 'text', value: this.state.username, onChange: this.changeLogin, className: 'form-control', placeholder: 'Login' }),
+	            _react2.default.createElement('br', null),
+	            _react2.default.createElement('input', { type: 'password', value: this.state.password, onChange: this.changePass, className: 'form-control', placeholder: 'Password' }),
+	            _react2.default.createElement('br', null),
+	            _react2.default.createElement(
+	                'dutton',
+	                { className: 'btn btn-primary', onClick: this.submit },
+	                'Login'
+	            )
+	        );
+	    }
+	});
 
 /***/ }
 /******/ ]);

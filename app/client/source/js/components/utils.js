@@ -12,14 +12,14 @@ function error_handling(context) {
 export function Request(url, data, type, context, success, error) {
     var emptyFunction = function(){};
     success = success || emptyFunction;
+    var error_func;
     if(error) {
-        error = function(err) {
-            console.log(err);
-            return error
+        error_func = function() {
+            return error;
         }
     }
     else {
-        error = error_handling;
+        error_func = error_handling;
     }
     data = data || {};
     $.ajax({
@@ -27,13 +27,13 @@ export function Request(url, data, type, context, success, error) {
         type,
         data,
         dataType: 'json',
-        error: error(context),
+        error: error_func(context),
         success(data) {
             if(data.status == 0) {
                 success(data.body);
             }
             else {
-                error(context)(data.status);
+                error_func(context)(data.status);
             }
         }
     });

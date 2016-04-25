@@ -26,6 +26,12 @@ var boardSchema = new mongoose.Schema({
 });
 models.Board = mongoose.model('Board', boardSchema);
 
+var adminSchema = new mongoose.Schema({
+    username: String,
+    password: String
+});
+models.Admin = mongoose.model('Admin', adminSchema);
+
 var postSchema = new mongoose.Schema({
     lang: String,
     board: String,

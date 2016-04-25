@@ -102,6 +102,13 @@
     color: #eb6864;
 }
 
+/*login panel*/
+.login {
+    width: 400px;
+    margin: auto;
+    text-align: center;
+}
+
 /* other */
 .clearfix {
     clear: both;

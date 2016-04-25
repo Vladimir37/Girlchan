@@ -1,3 +1,5 @@
+var passport = require('passport');
+
 var models = require('../basis/models');
 var stacks = require('./stack');
 var serialize = require('../basis/serialize');
@@ -105,6 +107,10 @@ class ApiController {
         var lang = req.query.lang;
         var board = req.query.board;
         var thread = req.query.thread;
+        if(!thread) {
+            res.end(serialize(1));
+            return false;
+        }
         var op_post = models.Post.findOne({
             lang,
             board,
@@ -194,6 +200,31 @@ class ApiController {
             console.log(err);
             res.end(serialize(1));
         });
+    }
+    authorization(req, res, next) {
+        passport.authenticate('local', function(err, user) {
+            if(err || !user) {
+                res.end(serialize(1));
+                return false;
+            }
+            req.logIn(user, function(err) {
+                if(err) {
+                    console.log(err);
+                    res.end(serialize(1));
+                }
+                else {
+                    res.end(serialize(0));
+                }
+            });
+        })(req, res, next);
+    }
+    check_logging(req, res, next) {
+        if(req.isAuthenticated()) {
+            res.end(serialize(0));
+        }
+        else {
+            res.end(serialize(1));
+        }
     }
 }
 
