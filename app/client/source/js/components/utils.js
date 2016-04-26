@@ -37,7 +37,15 @@ export function Request(url, data, type, context, success, error) {
             }
         }
     });
-};
+}
+
+export function check_status(admin, user) {
+    Request('/api/check_logging', {}, 'GET', this, function() {
+        admin();
+    }, function() {
+        user();
+    });
+}
 
 export function toast(text, is_bad) {
     toastr.options = {

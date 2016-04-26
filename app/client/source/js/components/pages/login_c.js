@@ -2,15 +2,30 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import {PleaseWait} from './../templates.js';
-import {Request, toast} from './../utils.js';
+import {Request, toast, check_status} from './../utils.js';
 
 export var Login = React.createClass({
     getInitialState() {
         return {
             logged: false,
+            checked: false,
             username: '',
             password: ''
         };
+    },
+    checkStatus() {
+        var self = this;
+        check_status(function() {
+            self.setState({
+                logged: true,
+                checked: true
+            });
+        }, function() {
+            self.setState({
+                logged: false,
+                checked: true
+            });
+        });
     },
     changeLogin(event) {
         this.setState({
@@ -39,12 +54,23 @@ export var Login = React.createClass({
         }
     },
     render() {
-        return <section className="login">
-            <input type="text" value={this.state.username} onChange={this.changeLogin} className='form-control' placeholder='Login' />
-            <br/>
-            <input type="password" value={this.state.password} onChange={this.changePass} className='form-control' placeholder='Password' />
-            <br/>
-            <dutton className="btn btn-primary" onClick={this.submit}>Login</dutton>
-        </section>
+        if(!this.state.checked) {
+            this.checkStatus();
+            return <PleaseWait />;
+        }
+        else if(this.state.logged) {
+            return <h2>You are logged</h2>;
+        }
+        else {
+            return <section className="login">
+                <input type="text" value={this.state.username} onChange={this.changeLogin} className='form-control'
+                       placeholder='Login'/>
+                <br/>
+                <input type="password" value={this.state.password} onChange={this.changePass} className='form-control'
+                       placeholder='Password'/>
+                <br/>
+                <dutton className="btn btn-primary" onClick={this.submit}>Login</dutton>
+            </section>
+        }
     }
 });

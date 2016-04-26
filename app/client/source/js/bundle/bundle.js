@@ -37439,9 +37439,7 @@
 
 	var _board_c = __webpack_require__(351);
 
-	var _thread_c = __webpack_require__(352);
-
-	var _login_c = __webpack_require__(353);
+	var _login_c = __webpack_require__(352);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -37575,6 +37573,7 @@
 	    render: function render() {
 	        var read = '';
 	        var color_panel = '';
+	        var admin_button = '';
 	        if (this.props.data.color) {
 	            color_panel = _react2.default.createElement('article', { className: 'color_panel circle', style: { background: "#" + this.props.data.color } });
 	        }
@@ -37583,6 +37582,27 @@
 	                'button',
 	                { className: 'btn btn-xs full_read_btn', onClick: this.readFullThread },
 	                'Read full thread'
+	            );
+	        }
+	        if (this.props.admin) {
+	            admin_button = _react2.default.createElement(
+	                'article',
+	                { className: 'admin_btns' },
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: 'btn btn-xs full_read_btn' },
+	                    'Ban author'
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: 'btn btn-xs full_read_btn' },
+	                    'Move this topic'
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: 'btn btn-xs full_read_btn' },
+	                    'Delete this topic'
+	                )
 	            );
 	        }
 	        return _react2.default.createElement(
@@ -37600,6 +37620,8 @@
 	                ' ',
 	                read,
 	                ' ',
+	                admin_button,
+	                ' ',
 	                color_panel
 	            ),
 	            _react2.default.createElement('article', { className: 'panel-body', dangerouslySetInnerHTML: (0, _utils.markdown)(this.props.data.text) })
@@ -37614,8 +37636,25 @@
 	    },
 	    render: function render() {
 	        var color_panel = '';
+	        var admin_button = '';
 	        if (this.props.data.color) {
 	            color_panel = _react2.default.createElement('article', { className: 'color_panel circle', style: { background: "#" + this.props.data.color } });
+	        }
+	        if (this.props.admin) {
+	            admin_button = _react2.default.createElement(
+	                'article',
+	                { className: 'admin_btns' },
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: 'btn btn-xs full_read_btn' },
+	                    'Ban author'
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: 'btn btn-xs full_read_btn' },
+	                    'Delete this post'
+	                )
+	            );
 	        }
 	        return _react2.default.createElement(
 	            'article',
@@ -37624,6 +37663,8 @@
 	                'article',
 	                { className: 'panel-heading' },
 	                (0, _moment2.default)(this.props.data.time).format('LTS L'),
+	                ' ',
+	                admin_button,
 	                ' ',
 	                color_panel
 	            ),
@@ -37824,15 +37865,6 @@
 	                    { className: 'modal-content' },
 	                    _react2.default.createElement(
 	                        'article',
-	                        { className: 'modal-header' },
-	                        _react2.default.createElement(
-	                            'h4',
-	                            { className: 'modal-title' },
-	                            'Заголовок'
-	                        )
-	                    ),
-	                    _react2.default.createElement(
-	                        'article',
 	                        { className: 'modal-body' },
 	                        _react2.default.createElement(Thread, { data: data, num: this.state.load_num })
 	                    ),
@@ -37914,8 +37946,10 @@
 	            this.getAllPosts();
 	            return _react2.default.createElement(PleaseWait, null);
 	        } else {
+	            console.log(this.props.admin);
+	            var self = this;
 	            var posts_arr = this.state.posts.map(function (post) {
-	                return _react2.default.createElement(Post, { data: post });
+	                return _react2.default.createElement(Post, { data: post, admin: self.props.admin });
 	            });
 	            var footer;
 	            if (this.state.loading) {
@@ -37930,7 +37964,7 @@
 	            return _react2.default.createElement(
 	                'section',
 	                { className: 'full_thread' },
-	                _react2.default.createElement(FirstPost, { data: this.state.first_post }),
+	                _react2.default.createElement(FirstPost, { data: this.state.first_post, admin: this.props.admin }),
 	                posts_arr,
 	                footer,
 	                _react2.default.createElement(Posting, { button: 'Create post', addr: 'create_post', refresh: this.getNewPosts, param: this.props.data })
@@ -51239,12 +51273,13 @@
 /* 336 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function($) {"use strict";
+	/* WEBPACK VAR INJECTION */(function($) {'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.Request = undefined;
+	exports.check_status = check_status;
 	exports.toast = toast;
 	exports.markdown = markdown;
 
@@ -51289,8 +51324,16 @@
 	            }
 	        }
 	    });
-	}exports.Request = Request;
-	;
+	}
+
+	exports.Request = Request;
+	function check_status(admin, user) {
+	    Request('/api/check_logging', {}, 'GET', this, function () {
+	        admin();
+	    }, function () {
+	        user();
+	    });
+	}
 
 	function toast(text, is_bad) {
 	    _toastr2.default.options = {
@@ -52375,13 +52418,14 @@
 	            board: this.props.param.board,
 	            thread: this.props.data.op_post._id
 	        };
+	        var self = this;
 	        var posts_arr = this.state.posts.map(function (post) {
-	            return _react2.default.createElement(_templates.Post, { data: post });
+	            return _react2.default.createElement(_templates.Post, { data: post, admin: self.props.admin });
 	        });
 	        return _react2.default.createElement(
 	            'section',
 	            { className: 'thread' },
-	            _react2.default.createElement(_templates.FirstPost, { data: this.props.data.op_post, param: this.props.param, read: 'true' }),
+	            _react2.default.createElement(_templates.FirstPost, { data: this.props.data.op_post, param: this.props.param, read: 'true', admin: this.props.admin }),
 	            count_panel,
 	            posts_arr,
 	            _react2.default.createElement(_templates.Posting, { button: 'Reply to this topic', addr: 'create_post', refresh: this.getNewPosts, param: params, small: 'true' })
@@ -52397,6 +52441,8 @@
 	        return {
 	            loaded_threads: false,
 	            loaded_content: false,
+	            status_checked: false,
+	            admin: false,
 	            error: false,
 	            threads: [],
 	            content: [],
@@ -52410,6 +52456,20 @@
 	            console.log(window.location.hash.slice(1));
 	            (0, _jquery2.default)('#modal-thread').modal('show');
 	        }
+	    },
+	    getStatus: function getStatus() {
+	        var self = this;
+	        (0, _utils.Request)('/api/check_logging', {}, 'GET', self, function () {
+	            self.setState({
+	                status_checked: true,
+	                admin: true
+	            });
+	        }, function () {
+	            self.setState({
+	                status_checked: true,
+	                admin: false
+	            });
+	        });
 	    },
 	    getThreads: function getThreads() {
 	        var self = this;
@@ -52443,6 +52503,9 @@
 	        _moment2.default.locale(this.props.params.lang);
 	        if (this.state.error) {
 	            return _react2.default.createElement(_templates.NotFound, null);
+	        } else if (!this.state.status_checked) {
+	            this.getStatus();
+	            return _react2.default.createElement(_templates.PleaseWait, null);
 	        } else if (!this.state.loaded_threads) {
 	            this.getThreads();
 	            return _react2.default.createElement(_templates.PleaseWait, null);
@@ -52452,7 +52515,7 @@
 	        } else {
 	            var self = this;
 	            var threads_arr = this.state.content.map(function (thread) {
-	                return _react2.default.createElement(Thread, { data: thread, param: self.props.params });
+	                return _react2.default.createElement(Thread, { data: thread, param: self.props.params, admin: self.state.admin });
 	            });
 	            return _react2.default.createElement(
 	                'article',
@@ -52474,36 +52537,6 @@
 
 /***/ },
 /* 352 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _react = __webpack_require__(17);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactDom = __webpack_require__(174);
-
-	var _reactDom2 = _interopRequireDefault(_reactDom);
-
-	var _reactRouter = __webpack_require__(175);
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _moment = __webpack_require__(235);
-
-	var _moment2 = _interopRequireDefault(_moment);
-
-	var _templates = __webpack_require__(233);
-
-	var _utils = __webpack_require__(336);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/***/ },
-/* 353 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -52532,9 +52565,24 @@
 	    getInitialState: function getInitialState() {
 	        return {
 	            logged: false,
+	            checked: false,
 	            username: '',
 	            password: ''
 	        };
+	    },
+	    checkStatus: function checkStatus() {
+	        var self = this;
+	        (0, _utils.check_status)(function () {
+	            self.setState({
+	                logged: true,
+	                checked: true
+	            });
+	        }, function () {
+	            self.setState({
+	                logged: false,
+	                checked: true
+	            });
+	        });
 	    },
 	    changeLogin: function changeLogin(event) {
 	        this.setState({
@@ -52562,19 +52610,32 @@
 	        }
 	    },
 	    render: function render() {
-	        return _react2.default.createElement(
-	            'section',
-	            { className: 'login' },
-	            _react2.default.createElement('input', { type: 'text', value: this.state.username, onChange: this.changeLogin, className: 'form-control', placeholder: 'Login' }),
-	            _react2.default.createElement('br', null),
-	            _react2.default.createElement('input', { type: 'password', value: this.state.password, onChange: this.changePass, className: 'form-control', placeholder: 'Password' }),
-	            _react2.default.createElement('br', null),
-	            _react2.default.createElement(
-	                'dutton',
-	                { className: 'btn btn-primary', onClick: this.submit },
-	                'Login'
-	            )
-	        );
+	        if (!this.state.checked) {
+	            this.checkStatus();
+	            return _react2.default.createElement(_templates.PleaseWait, null);
+	        } else if (this.state.logged) {
+	            return _react2.default.createElement(
+	                'h2',
+	                null,
+	                'You are logged'
+	            );
+	        } else {
+	            return _react2.default.createElement(
+	                'section',
+	                { className: 'login' },
+	                _react2.default.createElement('input', { type: 'text', value: this.state.username, onChange: this.changeLogin, className: 'form-control',
+	                    placeholder: 'Login' }),
+	                _react2.default.createElement('br', null),
+	                _react2.default.createElement('input', { type: 'password', value: this.state.password, onChange: this.changePass, className: 'form-control',
+	                    placeholder: 'Password' }),
+	                _react2.default.createElement('br', null),
+	                _react2.default.createElement(
+	                    'dutton',
+	                    { className: 'btn btn-primary', onClick: this.submit },
+	                    'Login'
+	                )
+	            );
+	        }
 	    }
 	});
 

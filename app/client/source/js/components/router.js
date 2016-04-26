@@ -7,7 +7,6 @@ import {ServerError, NotFound, PleaseWait} from './templates.js';
 import {Languages} from "./pages/languages_c.js";
 import {List} from "./pages/list_c.js";
 import {Board} from "./pages/board_c.js";
-import {Thread} from "./pages/thread_c.js";
 import {Login} from "./pages/login_c.js";
 
 $(document).ready(function() {

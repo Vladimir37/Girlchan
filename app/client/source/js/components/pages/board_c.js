@@ -61,11 +61,12 @@ var Thread = React.createClass({
             board: this.props.param.board,
             thread: this.props.data.op_post._id
         };
+        var self = this;
         var posts_arr = this.state.posts.map(function(post) {
-            return <Post data={post} />;
+            return <Post data={post} admin={self.props.admin} />;
         });
         return <section className="thread">
-            <FirstPost data={this.props.data.op_post} param={this.props.param} read="true" />
+            <FirstPost data={this.props.data.op_post} param={this.props.param} read="true" admin={this.props.admin} />
             {count_panel}
             {posts_arr}
             <Posting button="Reply to this topic" addr="create_post" refresh={this.getNewPosts} param={params} small="true" />
@@ -79,6 +80,8 @@ export var Board = React.createClass({
         return {
             loaded_threads: false,
             loaded_content: false,
+            status_checked: false,
+            admin: false,
             error: false,
             threads: [],
             content: [],
@@ -92,6 +95,20 @@ export var Board = React.createClass({
             console.log(window.location.hash.slice(1));
             $('#modal-thread').modal('show');
         }
+    },
+    getStatus() {
+        var self = this;
+        Request('/api/check_logging', {}, 'GET', self, function() {
+            self.setState({
+                status_checked: true,
+                admin: true
+            });
+        }, function() {
+            self.setState({
+                status_checked: true,
+                admin: false
+            });
+        });
     },
     getThreads() {
         var self = this;
@@ -126,6 +143,10 @@ export var Board = React.createClass({
         if(this.state.error) {
             return <NotFound />;
         }
+        else if(!this.state.status_checked) {
+            this.getStatus();
+            return <PleaseWait />;
+        }
         else if(!this.state.loaded_threads) {
             this.getThreads();
             return <PleaseWait />;
@@ -137,7 +158,7 @@ export var Board = React.createClass({
         else {
             var self = this;
             var threads_arr = this.state.content.map(function(thread) {
-                return <Thread data={thread} param={self.props.params} />
+                return <Thread data={thread} param={self.props.params} admin={self.state.admin} />
             });
             return <article className="threads_list">
                 <ModalThread lang={this.props.params.lang} board={this.props.params.board} />

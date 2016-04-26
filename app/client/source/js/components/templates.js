@@ -56,16 +56,24 @@ export var FirstPost = React.createClass({
     render() {
         var read = '';
         var color_panel = '';
+        var admin_button = '';
         if(this.props.data.color) {
             color_panel = <article className="color_panel circle" style={{background: "#" + this.props.data.color}}></article>;
         }
         if(this.props.read) {
             read = <button className="btn btn-xs full_read_btn" onClick={this.readFullThread}>Read full thread</button>;
         }
+        if(this.props.admin) {
+            admin_button = <article className="admin_btns">
+                <button className="btn btn-xs full_read_btn">Ban author</button>
+                <button className="btn btn-xs full_read_btn">Move this topic</button>
+                <button className="btn btn-xs full_read_btn">Delete this topic</button>
+            </article>;
+        }
         return <article className="panel panel-primary">
             <article className="panel-heading">
                 <h4 className="modal-title">{this.props.data.title}</h4>
-                {Moment(this.props.data.time).format('LTS L')} {read} {color_panel}
+                {Moment(this.props.data.time).format('LTS L')} {read} {admin_button} {color_panel}
             </article>
             <article className="panel-body" dangerouslySetInnerHTML={markdown(this.props.data.text)} />
         </article>;
@@ -78,11 +86,18 @@ export var Post = React.createClass({
     },
     render() {
         var color_panel = '';
+        var admin_button = '';
         if(this.props.data.color) {
             color_panel = <article className="color_panel circle" style={{background: "#" + this.props.data.color}}></article>;
         }
+        if(this.props.admin) {
+            admin_button = <article className="admin_btns">
+                <button className="btn btn-xs full_read_btn">Ban author</button>
+                <button className="btn btn-xs full_read_btn">Delete this post</button>
+            </article>;
+        }
         return <article className="panel panel-default post">
-            <article className="panel-heading">{Moment(this.props.data.time).format('LTS L')} {color_panel}</article>
+            <article className="panel-heading">{Moment(this.props.data.time).format('LTS L')} {admin_button} {color_panel}</article>
             <article className="panel-body" dangerouslySetInnerHTML={markdown(this.props.data.text)} />
         </article>;
     }
@@ -241,9 +256,6 @@ export var ModalThread = React.createClass({
         return <article className="modal fade" id="modal-thread" tabIndex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
             <article className="modal-dialog modal-lg">
                 <article className="modal-content">
-                    <article className="modal-header">
-                        <h4 className="modal-title">Заголовок</h4>
-                    </article>
                     <article className="modal-body">
                         <Thread data={data} num={this.state.load_num} />
                     </article>
@@ -325,8 +337,10 @@ export var Thread = React.createClass({
             return <PleaseWait />;
         }
         else {
+            console.log(this.props.admin);
+            var self = this;
             var posts_arr = this.state.posts.map(function(post) {
-                return <Post data={post} />;
+                return <Post data={post} admin={self.props.admin} />;
             });
             var footer;
             if(this.state.loading) {
@@ -336,7 +350,7 @@ export var Thread = React.createClass({
                 footer = <button className="btn btn-primary" onClick={this.getNewPosts}>Load new!</button>;
             }
             return <section className="full_thread">
-                <FirstPost data={this.state.first_post} />
+                <FirstPost data={this.state.first_post} admin={this.props.admin} />
                 {posts_arr}
                 {footer}
                 <Posting button="Create post" addr="create_post" refresh={this.getNewPosts} param={this.props.data} />

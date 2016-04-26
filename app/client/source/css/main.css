@@ -101,6 +101,13 @@
 .quote {
     color: #eb6864;
 }
+.modal-header h4.modal-title {
+    color: black;
+}
+.admin_btns {
+    float: right;
+}
+
 
 /*login panel*/
 .login {
